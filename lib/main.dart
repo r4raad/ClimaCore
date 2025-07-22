@@ -5,27 +5,31 @@ import 'firebase_options.dart';
 import 'screens/splash_screen.dart'; 
 import 'screens/auth_screen.dart'; 
 import 'screens/home_screen.dart'; 
+import 'package:google_fonts/google_fonts.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(MyApp());
+  runApp(ClimaCore());
 }
 
-class MyApp extends StatelessWidget {
+class ClimaCore extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'My App',
+      title: 'ClimaCore',
       initialRoute: '/',
       routes: {
         '/': (context) => SplashScreen(),
         '/auth': (context) => AuthScreen(),
         '/home': (context) => HomeScreen(),
       },
+      theme: ThemeData(
+        textTheme: GoogleFonts.questrialTextTheme(Theme.of(context).textTheme),
+      ),
     );
   }
 }

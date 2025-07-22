@@ -28,13 +28,13 @@ class _EmailAuthFormState extends State<EmailAuthForm> {
           await FirebaseAuth.instance.signInWithEmailAndPassword(email: _email, password: _password);
           widget.showSuccessDialog('''Welcome Back to ClimaCore!
 Your all-in-one space to learn, act, and lead the way in climate action.''');
-           Navigator.pushReplacementNamed(context, '/home');
+           //Navigator.pushReplacementNamed(context, '/home');
         } else {
           UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(email: _email, password: _password);
           
            widget.showSuccessDialog('''Welcome to ClimaCore!
 Your all-in-one space to learn, act, and lead the way in climate action.''');
-           Navigator.pushReplacementNamed(context, '/home');
+           //Navigator.pushReplacementNamed(context, '/home');
         }
       } on FirebaseAuthException catch (e) {
         String errorMessage;
