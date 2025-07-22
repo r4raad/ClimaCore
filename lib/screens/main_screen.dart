@@ -84,7 +84,7 @@ class _MainScreenState extends State<MainScreen> {
             activeIcon,
             width: iconSize,
             height: iconSize,
-            color: Colors.white,
+            colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
           ),
         ),
       );
@@ -96,7 +96,7 @@ class _MainScreenState extends State<MainScreen> {
           activeIcon,
           width: iconSize,
           height: iconSize,
-          color: Colors.green,
+          colorFilter: ColorFilter.mode(Colors.green, BlendMode.srcIn),
         ),
       );
     } else {
@@ -107,7 +107,7 @@ class _MainScreenState extends State<MainScreen> {
           inactiveIcon,
           width: iconSize,
           height: iconSize,
-          color: Colors.grey,
+          colorFilter: ColorFilter.mode(Colors.grey, BlendMode.srcIn),
         ),
       );
     }
