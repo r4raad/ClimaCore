@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'home_screen.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import '../services/user_service.dart';
+import '../models/user.dart';
+import 'climaconnect_screen.dart';
+import 'leaderboard_screen.dart';
 
 class MainScreen extends StatefulWidget {
   @override
@@ -9,15 +14,37 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
+  AppUser? _appUser;
+  bool _loadingUser = true;
 
-  // Placeholder screens for now
-  static List<Widget> _screenOptions = <Widget>[
-    HomeScreen(),
-    Center(child: Text('ClimaConnect Screen')),
-    Center(child: Text('Leaderboard Screen')),
-    Center(child: Text('Eco Mission Screen')),
-    Center(child: Text('ClimaSights Screen')),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _loadUser();
+  }
+
+  Future<void> _loadUser() async {
+    final firebaseUser = FirebaseAuth.instance.currentUser;
+    print('Loading user:  [32m [1m [4m [7m${firebaseUser?.uid} [0m');
+    if (firebaseUser != null) {
+      try {
+        final user = await UserService().getUserById(firebaseUser.uid);
+        print('User loaded: $user');
+        setState(() {
+          _appUser = user;
+          _loadingUser = false;
+        });
+      } catch (e, stack) {
+        print('Error loading user: $e');
+        print(stack);
+        setState(() {
+          _loadingUser = false;
+        });
+      }
+    } else {
+      setState(() { _loadingUser = false; });
+    }
+  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -27,12 +54,33 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (_loadingUser) {
+      return Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
     return Scaffold(
-      body: _screenOptions.elementAt(_selectedIndex),
+      body: _getScreen(_selectedIndex),
       bottomNavigationBar: buildBottomNavigationBar(),
       floatingActionButton: _buildFloatingNavItem(2, 'assets/icons/leaderboard_active.svg', 'assets/icons/leaderboard_inactive.svg'),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
+  }
+
+  Widget _getScreen(int index) {
+    switch (index) {
+      case 0:
+        return HomeScreen();
+      case 1:
+        if (_appUser == null) return Center(child: Text('User not found'));
+        return ClimaConnectScreen(user: _appUser!);
+      case 2:
+        return LeaderboardScreen();
+      case 3:
+        return Center(child: Text('Eco Mission Screen'));
+      case 4:
+        return Center(child: Text('ClimaSights Screen'));
+      default:
+        return HomeScreen();
+    }
   }
 
   Widget buildBottomNavigationBar() {
@@ -65,7 +113,9 @@ class _MainScreenState extends State<MainScreen> {
         isSelected ? activeIcon : inactiveIcon,
         width: iconSize,
         height: iconSize,
-        colorFilter: ColorFilter.mode(isSelected ? Colors.green : Colors.grey, BlendMode.srcIn),
+        colorFilter: isSelected 
+          ? null // Don't apply color filter for active icons since they have their own color
+          : ColorFilter.mode(Colors.grey, BlendMode.srcIn),
       ),
     );
   }
@@ -94,7 +144,9 @@ class _MainScreenState extends State<MainScreen> {
           isSelected ? activeIcon : inactiveIcon, // Use both active and inactive icons
           width: iconSize,
           height: iconSize,
-          colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn), // White color for the icon
+          colorFilter: isSelected 
+            ? null // Don't apply color filter for active icons since they have their own color
+            : ColorFilter.mode(Colors.white, BlendMode.srcIn), // White color for inactive icons
         ),
       ),
     );

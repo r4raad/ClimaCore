@@ -1,6 +1,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../services/user_service.dart';
+import '../models/user.dart';
 
 class EmailAuthForm extends StatefulWidget {
   final Function(String) showSuccessDialog;
@@ -25,16 +27,49 @@ class _EmailAuthFormState extends State<EmailAuthForm> {
       _formKey.currentState!.save();
       try {
         if (_isLogin) {
-          await FirebaseAuth.instance.signInWithEmailAndPassword(email: _email, password: _password);
-          widget.showSuccessDialog('''Welcome Back to ClimaCore!
-Your all-in-one space to learn, act, and lead the way in climate action.''');
-           //Navigator.pushReplacementNamed(context, '/home');
+          UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(email: _email, password: _password);
+          // Ensure user document exists in Firestore
+          final userService = UserService();
+          final firebaseUser = userCredential.user;
+          if (firebaseUser != null) {
+            AppUser? appUser = await userService.getUserById(firebaseUser.uid);
+            if (appUser == null) {
+              // Create user document with minimal info (name unknown)
+              await userService.addUser(AppUser(
+                id: firebaseUser.uid,
+                name: firebaseUser.displayName ?? '',
+                points: 0,
+                savedPosts: [],
+                likedPosts: [],
+                profilePic: null, // Default: no profile picture
+                actions: 0,
+                streak: 0,
+                weekPoints: 0,
+                weekGoal: 800,
+              ));
+            }
+          }
+          widget.showSuccessDialog('''Welcome Back to ClimaCore!\nYour all-in-one space to learn, act, and lead the way in climate action.''');
         } else {
           UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(email: _email, password: _password);
-          
-           widget.showSuccessDialog('''Welcome to ClimaCore!
-Your all-in-one space to learn, act, and lead the way in climate action.''');
-           //Navigator.pushReplacementNamed(context, '/home');
+          // Create user document in Firestore
+          final userService = UserService();
+          final firebaseUser = userCredential.user;
+          if (firebaseUser != null) {
+            await userService.addUser(AppUser(
+              id: firebaseUser.uid,
+              name: (_firstName + ' ' + _lastName).trim(),
+              points: 0,
+              savedPosts: [],
+              likedPosts: [],
+              profilePic: null, // Default: no profile picture
+              actions: 0,
+              streak: 0,
+              weekPoints: 0,
+              weekGoal: 800,
+            ));
+          }
+          widget.showSuccessDialog('''Welcome to ClimaCore!\nYour all-in-one space to learn, act, and lead the way in climate action.''');
         }
       } on FirebaseAuthException catch (e) {
         String errorMessage;

@@ -1,175 +1,437 @@
 import 'package:flutter/material.dart';
+import '../models/post.dart';
+import '../models/activity.dart';
 import '../models/user.dart';
 import '../services/post_service.dart';
-import '../models/post.dart';
-import '../widgets/post_card.dart';
 import '../services/activity_service.dart';
-import '../models/activity.dart';
+import '../services/user_service.dart';
+import '../services/school_service.dart';
+import '../widgets/post_card.dart';
 import '../widgets/activity_card.dart';
-import 'activity_detail_screen.dart';
-import 'create_post_screen.dart';
-import 'comments_screen.dart';
 
 class CommunityScreen extends StatefulWidget {
   final AppUser user;
   final String schoolId;
-  const CommunityScreen({Key? key, required this.user, required this.schoolId}) : super(key: key);
+
+  const CommunityScreen({
+    Key? key,
+    required this.user,
+    required this.schoolId,
+  }) : super(key: key);
 
   @override
   State<CommunityScreen> createState() => _CommunityScreenState();
 }
 
-class _CommunityScreenState extends State<CommunityScreen> with SingleTickerProviderStateMixin {
-  late TabController _tabController;
+class _CommunityScreenState extends State<CommunityScreen> {
   final PostService _postService = PostService();
-  List<Post> _posts = [];
-  bool _loadingPosts = true;
   final ActivityService _activityService = ActivityService();
+  final UserService _userService = UserService();
+  final SchoolService _schoolService = SchoolService();
+
+  List<Post> _posts = [];
   List<Activity> _activities = [];
-  bool _loadingActivities = true;
+  bool _isLoading = true;
+  bool _hasError = false;
+  String? _schoolName;
+
+  // TODO: Replace with actual school image URL when available
+  static const String _schoolImageUrl = 'https://via.placeholder.com/400x200/2196F3/FFFFFF?text=School+Image';
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
-    _fetchPosts();
-    _fetchActivities();
+    _loadData();
+    _loadSchoolName();
   }
 
-  Future<void> _fetchPosts() async {
-    setState(() { _loadingPosts = true; });
-    final posts = await _postService.getPosts(widget.schoolId);
+  Future<void> _loadData() async {
     setState(() {
-      _posts = posts;
-      _loadingPosts = false;
+      _isLoading = true;
+      _hasError = false;
     });
+
+    try {
+      // Load posts and activities in parallel for better performance
+      final results = await Future.wait([
+        _postService.getPosts(widget.schoolId),
+        _activityService.getActivities(widget.schoolId),
+      ]);
+
+      setState(() {
+        _posts = results[0] as List<Post>;
+        _activities = results[1] as List<Activity>;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+        _hasError = true;
+      });
+    }
   }
 
-  Future<void> _fetchActivities() async {
-    setState(() { _loadingActivities = true; });
-    final activities = await _activityService.getActivities(widget.schoolId);
-    setState(() {
-      _activities = activities;
-      _loadingActivities = false;
-    });
-  }
-
-  void _likePost(Post post) async {
-    await _postService.likePost(widget.schoolId, post.id, widget.user.id);
-    _fetchPosts();
-  }
-
-  void _savePost(Post post) async {
-    await _postService.savePost(widget.schoolId, post.id, widget.user.id);
-    _fetchPosts();
-  }
-
-  void _commentPost(Post post) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => CommentsScreen(schoolId: widget.schoolId, postId: post.id, user: widget.user),
-      ),
-    );
-  }
-
-  void _createPost() async {
-    final result = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => CreatePostScreen(schoolId: widget.schoolId, user: widget.user),
-      ),
-    );
-    if (result == true) _fetchPosts();
-  }
-
-  void _openActivityDetail(Activity activity) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ActivityDetailScreen(activity: activity, schoolName: _getSchoolName()),
-      ),
-    );
+  Future<void> _loadSchoolName() async {
+    try {
+      final school = await _schoolService.getSchoolById(widget.schoolId);
+      setState(() {
+        _schoolName = school?.name;
+      });
+    } catch (e) {
+      print('Error loading school name: $e');
+    }
   }
 
   String _getSchoolName() {
-    // Placeholder: you can fetch the school name from Firestore or pass it down
-    return '';
+    return _schoolName ?? 'School Community';
   }
 
-  Widget _buildPostsTab() {
-    if (_loadingPosts) return Center(child: CircularProgressIndicator());
-    if (_posts.isEmpty) return Center(child: Text('No posts yet.'));
-    return ListView.builder(
-      padding: EdgeInsets.all(16),
-      itemCount: _posts.length,
-      itemBuilder: (context, i) {
-        final post = _posts[i];
-        final liked = post.likes.contains(widget.user.id);
-        final saved = post.saves.contains(widget.user.id);
-        return PostCard(
-          post: post,
-          liked: liked,
-          saved: saved,
-          onLike: () => _likePost(post),
-          onSave: () => _savePost(post),
-          onComment: () => _commentPost(post),
+  Future<void> _leaveSchool() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Leave School'),
+        content: const Text('Are you sure you want to leave this school?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Leave'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      try {
+        await _userService.joinSchool(widget.user.id, '');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Successfully left the school'),
+            backgroundColor: Colors.orange,
+          ),
         );
-      },
-    );
-  }
-
-  Widget _buildActivitiesTab() {
-    if (_loadingActivities) return Center(child: CircularProgressIndicator());
-    if (_activities.isEmpty) return Center(child: Text('No activities yet.'));
-    final now = DateTime.now();
-    final upcoming = _activities.where((a) => a.date.isAfter(now)).toList();
-    final past = _activities.where((a) => a.date.isBefore(now)).toList();
-    return ListView(
-      padding: EdgeInsets.all(16),
-      children: [
-        if (upcoming.isNotEmpty) ...[
-          Text('Upcoming Activities', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-          SizedBox(height: 8),
-          ...upcoming.map((a) => ActivityCard(activity: a, onTap: () => _openActivityDetail(a))),
-          SizedBox(height: 24),
-        ],
-        if (past.isNotEmpty) ...[
-          Text('Past Activities', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-          SizedBox(height: 8),
-          ...past.map((a) => ActivityCard(activity: a, onTap: () => _openActivityDetail(a))),
-        ],
-      ],
-    );
+        Navigator.pop(context); // Go back to school selection
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to leave school: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Community'),
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: [
-            Tab(text: 'Posts'),
-            Tab(text: 'Activities'),
-          ],
-        ),
-      ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          _buildPostsTab(),
-          _buildActivitiesTab(),
+      body: CustomScrollView(
+        slivers: [
+          // Advanced scrolling app bar with school image background
+          SliverAppBar(
+            expandedHeight: 250.0,
+            floating: false,
+            pinned: true,
+            backgroundColor: Colors.blue,
+            title: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  _getSchoolName(),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                    shadows: [
+                      Shadow(
+                        offset: Offset(1.0, 1.0),
+                        blurRadius: 3.0,
+                        color: Colors.black54,
+                      ),
+                    ],
+                  ),
+                ),
+                const Text(
+                  'Community',
+                  style: TextStyle(
+                    color: Colors.white70,
+                    fontSize: 14,
+                    shadows: [
+                      Shadow(
+                        offset: Offset(1.0, 1.0),
+                        blurRadius: 3.0,
+                        color: Colors.black54,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            flexibleSpace: FlexibleSpaceBar(
+              background: Stack(
+                fit: StackFit.expand,
+                children: [
+                  // Background image with placeholder
+                  Image.network(
+                    _schoolImageUrl,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        decoration: const BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [Colors.blue, Colors.lightBlue],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                  // Gradient overlay for better text readability
+                  Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.transparent,
+                          Colors.black.withOpacity(0.3),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              PopupMenuButton<String>(
+                icon: const Icon(Icons.more_vert, color: Colors.white),
+                onSelected: (value) {
+                  if (value == 'leave') {
+                    _leaveSchool();
+                  }
+                },
+                itemBuilder: (context) => [
+                  const PopupMenuItem(
+                    value: 'leave',
+                    child: Row(
+                      children: [
+                        Icon(Icons.logout, color: Colors.red),
+                        SizedBox(width: 8),
+                        Text('Leave School'),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          
+          // Content
+          SliverToBoxAdapter(
+            child: _buildBody(),
+          ),
         ],
       ),
-      floatingActionButton: _tabController.index == 0
-          ? FloatingActionButton(
-              onPressed: _createPost,
-              child: Icon(Icons.add),
-              tooltip: 'Create Post',
-            )
-          : null,
+    );
+  }
+
+  Widget _buildBody() {
+    if (_isLoading) {
+      return const Padding(
+        padding: EdgeInsets.all(20.0),
+        child: Center(
+          child: Column(
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(height: 16),
+              Text('Loading community content...'),
+            ],
+          ),
+        ),
+      );
+    }
+
+    if (_hasError) {
+      return Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Center(
+          child: Column(
+            children: [
+              const Icon(
+                Icons.error_outline,
+                size: 64,
+                color: Colors.red,
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'Failed to Load Content',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Unable to load posts and activities.',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.grey),
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: _loadData,
+                child: const Text('Retry'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    return RefreshIndicator(
+      onRefresh: _loadData,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Posts Section
+          if (_posts.isNotEmpty) ...[
+            const Padding(
+              padding: EdgeInsets.all(16.0),
+              child: Text(
+                'Recent Posts',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: _posts.length,
+                             itemBuilder: (context, index) {
+                 final post = _posts[index];
+                 final liked = post.likes.contains(widget.user.id);
+                 final saved = post.saves.contains(widget.user.id);
+                 
+                 return Padding(
+                   padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+                   child: PostCard(
+                     post: post,
+                     liked: liked,
+                     saved: saved,
+                     onLike: () async {
+                       try {
+                         if (liked) {
+                           await _postService.unlikePost(widget.schoolId, post.id, widget.user.id);
+                         } else {
+                           await _postService.likePost(widget.schoolId, post.id, widget.user.id);
+                         }
+                         _loadData();
+                       } catch (e) {
+                         ScaffoldMessenger.of(context).showSnackBar(
+                           SnackBar(content: Text('Failed to ${liked ? 'unlike' : 'like'} post'), backgroundColor: Colors.red),
+                         );
+                       }
+                     },
+                     onSave: () async {
+                       try {
+                         if (saved) {
+                           await _postService.unsavePost(widget.schoolId, post.id, widget.user.id);
+                         } else {
+                           await _postService.savePost(widget.schoolId, post.id, widget.user.id);
+                         }
+                         _loadData();
+                       } catch (e) {
+                         ScaffoldMessenger.of(context).showSnackBar(
+                           SnackBar(content: Text('Failed to ${saved ? 'unsave' : 'save'} post'), backgroundColor: Colors.red),
+                         );
+                       }
+                     },
+                     onComment: () {
+                       // TODO: Navigate to comments screen
+                       ScaffoldMessenger.of(context).showSnackBar(
+                         const SnackBar(content: Text('Comments feature coming soon!')),
+                       );
+                     },
+                   ),
+                 );
+               },
+            ),
+          ],
+
+          // Activities Section
+          if (_activities.isNotEmpty) ...[
+            const Padding(
+              padding: EdgeInsets.all(16.0),
+              child: Text(
+                'Recent Activities',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: _activities.length,
+                             itemBuilder: (context, index) {
+                 return Padding(
+                   padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+                   child: ActivityCard(
+                     activity: _activities[index],
+                     onTap: () {
+                       // TODO: Navigate to activity detail screen
+                       ScaffoldMessenger.of(context).showSnackBar(
+                         const SnackBar(content: Text('Activity details coming soon!')),
+                       );
+                     },
+                   ),
+                 );
+               },
+            ),
+          ],
+
+          // Empty State
+          if (_posts.isEmpty && _activities.isEmpty)
+            Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Center(
+                child: Column(
+                  children: [
+                    const Icon(
+                      Icons.forum_outlined,
+                      size: 64,
+                      color: Colors.grey,
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'No Content Yet',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      'Be the first to share a post or activity!',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+          const SizedBox(height: 20),
+        ],
+      ),
     );
   }
 } 
