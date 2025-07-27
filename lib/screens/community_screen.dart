@@ -35,7 +35,6 @@ class _CommunityScreenState extends State<CommunityScreen> {
   bool _hasError = false;
   String? _schoolName;
 
-  // TODO: Replace with actual school image URL when available
   static const String _schoolImageUrl = 'https://via.placeholder.com/400x200/2196F3/FFFFFF?text=School+Image';
 
   @override
@@ -52,7 +51,6 @@ class _CommunityScreenState extends State<CommunityScreen> {
     });
 
     try {
-      // Load posts and activities in parallel for better performance
       final results = await Future.wait([
         _postService.getPosts(widget.schoolId),
         _activityService.getActivities(widget.schoolId),
@@ -114,7 +112,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
             backgroundColor: Colors.orange,
           ),
         );
-        Navigator.pop(context); // Go back to school selection
+        Navigator.pop(context);
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -131,7 +129,6 @@ class _CommunityScreenState extends State<CommunityScreen> {
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          // Advanced scrolling app bar with school image background
           SliverAppBar(
             expandedHeight: 250.0,
             floating: false,
@@ -176,7 +173,6 @@ class _CommunityScreenState extends State<CommunityScreen> {
               background: Stack(
                 fit: StackFit.expand,
                 children: [
-                  // Background image with placeholder
                   Image.network(
                     _schoolImageUrl,
                     fit: BoxFit.cover,
@@ -192,7 +188,6 @@ class _CommunityScreenState extends State<CommunityScreen> {
                       );
                     },
                   ),
-                  // Gradient overlay for better text readability
                   Container(
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
@@ -232,7 +227,6 @@ class _CommunityScreenState extends State<CommunityScreen> {
             ],
           ),
           
-          // Content
           SliverToBoxAdapter(
             child: _buildBody(),
           ),
@@ -298,7 +292,6 @@ class _CommunityScreenState extends State<CommunityScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Posts Section
           if (_posts.isNotEmpty) ...[
             const Padding(
               padding: EdgeInsets.all(16.0),
@@ -354,7 +347,6 @@ class _CommunityScreenState extends State<CommunityScreen> {
                        }
                      },
                      onComment: () {
-                       // TODO: Navigate to comments screen
                        ScaffoldMessenger.of(context).showSnackBar(
                          const SnackBar(content: Text('Comments feature coming soon!')),
                        );
@@ -365,7 +357,6 @@ class _CommunityScreenState extends State<CommunityScreen> {
             ),
           ],
 
-          // Activities Section
           if (_activities.isNotEmpty) ...[
             const Padding(
               padding: EdgeInsets.all(16.0),
@@ -387,7 +378,6 @@ class _CommunityScreenState extends State<CommunityScreen> {
                    child: ActivityCard(
                      activity: _activities[index],
                      onTap: () {
-                       // TODO: Navigate to activity detail screen
                        ScaffoldMessenger.of(context).showSnackBar(
                          const SnackBar(content: Text('Activity details coming soon!')),
                        );
@@ -398,7 +388,6 @@ class _CommunityScreenState extends State<CommunityScreen> {
             ),
           ],
 
-          // Empty State
           if (_posts.isEmpty && _activities.isEmpty)
             Padding(
               padding: const EdgeInsets.all(20.0),

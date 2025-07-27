@@ -25,13 +25,11 @@ class _ClimaConnectScreenState extends State<ClimaConnectScreen> with TickerProv
   bool _hasError = false;
   String? _joinedSchoolId;
 
-  // Advanced scroll effect
   final ScrollController _scrollController = ScrollController();
   double _scrollOffset = 0.0;
   static const double _expandedHeight = 250.0;
   static const double _collapsedHeight = kToolbarHeight;
 
-  // Animation controllers for smooth transitions
   late AnimationController _centerTitleController;
   late AnimationController _leftTitleController;
   late AnimationController _backgroundController;
@@ -41,7 +39,6 @@ class _ClimaConnectScreenState extends State<ClimaConnectScreen> with TickerProv
     super.initState();
     _joinedSchoolId = widget.user.joinedSchoolId;
     
-    // Initialize animation controllers
     _centerTitleController = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
@@ -80,7 +77,6 @@ class _ClimaConnectScreenState extends State<ClimaConnectScreen> with TickerProv
       _scrollOffset = offset;
     });
     
-    // Update animation controllers
     _centerTitleController.value = 1.0 - progress;
     _leftTitleController.value = progress;
     _backgroundController.value = 1.0 - progress;
@@ -100,14 +96,12 @@ class _ClimaConnectScreenState extends State<ClimaConnectScreen> with TickerProv
       final schools = await _schoolService.getSchools();
       print('📋 ClimaConnect: Received ${schools.length} schools');
       
-      // Debug: Print each school's details
       for (int i = 0; i < schools.length; i++) {
         final school = schools[i];
         print('🏫 School $i: ID=${school.id}, Name="${school.name}", ImageUrl="${school.imageUrl}"');
         print('🏫 School $i: Name length=${school.name.length}, Is empty=${school.name.isEmpty}');
       }
       
-      // If no schools found, create sample schools
       if (schools.isEmpty) {
         print('📝 ClimaConnect: No schools found, creating sample schools...');
         await _schoolService.createSampleSchools();
@@ -150,7 +144,6 @@ class _ClimaConnectScreenState extends State<ClimaConnectScreen> with TickerProv
         _joinedSchoolId = schoolId;
       });
       
-      // Find the school name for the success message
       final school = _schools.firstWhere((s) => s.id == schoolId);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -159,7 +152,6 @@ class _ClimaConnectScreenState extends State<ClimaConnectScreen> with TickerProv
         ),
       );
 
-      // Navigate to community screen
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -245,7 +237,6 @@ class _ClimaConnectScreenState extends State<ClimaConnectScreen> with TickerProv
                 return Stack(
                   fit: StackFit.expand,
                   children: [
-                    // Background SVG image with opacity
                     AnimatedOpacity(
                       opacity: t,
                       duration: const Duration(milliseconds: 200),
@@ -285,7 +276,6 @@ class _ClimaConnectScreenState extends State<ClimaConnectScreen> with TickerProv
                         },
                       ),
                     ),
-                    // Gradient overlay for better text readability
                     Container(
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
@@ -298,7 +288,6 @@ class _ClimaConnectScreenState extends State<ClimaConnectScreen> with TickerProv
                         ),
                       ),
                     ),
-                    // Center title (fades out and moves up)
                     AnimatedPositioned(
                       duration: const Duration(milliseconds: 200),
                       left: 0,
@@ -330,10 +319,9 @@ class _ClimaConnectScreenState extends State<ClimaConnectScreen> with TickerProv
                         ),
                       ),
                     ),
-                                         // Top-left title (fades in and moves up) - Always visible when collapsed
                      AnimatedPositioned(
                        duration: const Duration(milliseconds: 200),
-                       left: 16, // Add left padding
+                       left: 16,
                        right: 0,
                        top: 0,
                        bottom: 0,
@@ -342,7 +330,7 @@ class _ClimaConnectScreenState extends State<ClimaConnectScreen> with TickerProv
                          duration: const Duration(milliseconds: 200),
                          child: IgnorePointer(
                            child: Align(
-                             alignment: Alignment.centerLeft, // Vertically center, horizontally left
+                             alignment: Alignment.centerLeft,
                              child: Text(
                                'ClimaConnect',
                                style: TextStyle(
@@ -382,7 +370,6 @@ class _ClimaConnectScreenState extends State<ClimaConnectScreen> with TickerProv
               ),
             ],
           ),
-          // Content
           SliverToBoxAdapter(
             child: _buildBody(),
           ),

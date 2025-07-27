@@ -14,12 +14,11 @@ class PerformanceMonitor {
       final duration = DateTime.now().difference(startTime);
       _measurements.putIfAbsent(operation, () => []).add(duration);
       
-      // Log if operation takes longer than expected
       if (duration.inMilliseconds > 1000) {
         developer.log(
           'Slow operation detected: $operation took ${duration.inMilliseconds}ms',
           name: 'PerformanceMonitor',
-          level: 900, // Warning level
+          level: 900,
         );
       }
       
@@ -74,7 +73,6 @@ class PerformanceMonitor {
   }
 }
 
-// Convenience class for measuring async operations
 class AsyncPerformanceMonitor {
   static Future<T> measure<T>(String operation, Future<T> Function() task) async {
     PerformanceMonitor.startTimer(operation);

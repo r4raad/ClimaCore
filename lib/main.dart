@@ -4,7 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'screens/splash_screen.dart'; 
 import 'screens/auth_screen.dart'; 
-import 'screens/main_screen.dart'; // Import the new MainScreen
+import 'screens/main_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 void main() async {
@@ -25,7 +25,7 @@ class ClimaCore extends StatelessWidget {
       routes: {
         '/': (context) => SplashScreen(),
         '/auth': (context) => AuthScreen(),
-        '/home': (context) => MainScreen(), // Use MainScreen for the home route
+        '/home': (context) => MainScreen(),
       },
       theme: ThemeData(
         textTheme: GoogleFonts.questrialTextTheme(Theme.of(context).textTheme),

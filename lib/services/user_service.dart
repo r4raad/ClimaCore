@@ -24,7 +24,6 @@ class UserService {
     await usersCollection.doc(userId).update({'joinedSchoolId': schoolId});
   }
 
-  // Method to create dummy users for demo/competition
   Future<void> createDummyUsers() async {
     try {
       final dummyUsers = [

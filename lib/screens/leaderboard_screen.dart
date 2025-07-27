@@ -14,11 +14,10 @@ class LeaderboardScreen extends StatefulWidget {
 
 class _LeaderboardScreenState extends State<LeaderboardScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  int _selectedTab = 0; // 0: Weekly, 1: All Time
+  int _selectedTab = 0;
   String? _currentUserId;
   final UserService _userService = UserService();
   
-  // Caching and pagination
   List<AppUser> _cachedUsers = [];
   bool _isLoading = true;
   bool _hasMoreData = true;
@@ -160,7 +159,6 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> with SingleTicker
       return _buildEmptyState();
     }
 
-    // Sort users for leaderboard
     final allTimeLeaderboard = [..._cachedUsers]..sort((a, b) => b.points.compareTo(a.points));
     final weeklyLeaderboard = [..._cachedUsers]..sort((a, b) => b.weekPoints.compareTo(a.weekPoints));
     final currentUser = _cachedUsers.isNotEmpty ? _cachedUsers.firstWhere((u) => u.id == _currentUserId, orElse: () => _cachedUsers[0]) : null;

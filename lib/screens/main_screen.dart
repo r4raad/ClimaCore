@@ -86,15 +86,15 @@ class _MainScreenState extends State<MainScreen> {
   Widget buildBottomNavigationBar() {
     return BottomAppBar(
       shape: CircularNotchedRectangle(),
-      notchMargin: 6.0, // Adjust as needed
+      notchMargin: 6.0,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 4), // Reduced vertical padding
+        padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 4),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             _buildNavItem(0, 'assets/icons/home_active.svg', 'assets/icons/home_inactive.svg'),
             _buildNavItem(1, 'assets/icons/climaconnect_active.svg', 'assets/icons/climaconnect_inactive.svg'),
-            SizedBox(width: 60), // Placeholder for the floating center item
+            SizedBox(width: 60),
             _buildNavItem(3, 'assets/icons/ecomission_active.svg', 'assets/icons/ecomission_inactive.svg'),
             _buildNavItem(4, 'assets/icons/climasights_active.svg', 'assets/icons/climasights_inactive.svg'),
           ],
@@ -114,7 +114,7 @@ class _MainScreenState extends State<MainScreen> {
         width: iconSize,
         height: iconSize,
         colorFilter: isSelected 
-          ? null // Don't apply color filter for active icons since they have their own color
+          ? null
           : ColorFilter.mode(Colors.grey, BlendMode.srcIn),
       ),
     );
@@ -129,7 +129,7 @@ class _MainScreenState extends State<MainScreen> {
       child: Container(
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: isSelected ? Colors.green : Colors.grey, // Color based on selection
+          color: isSelected ? Colors.green : Colors.grey,
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.3),
@@ -141,12 +141,12 @@ class _MainScreenState extends State<MainScreen> {
         ),
         padding: EdgeInsets.all(10),
         child: SvgPicture.asset(
-          isSelected ? activeIcon : inactiveIcon, // Use both active and inactive icons
+          isSelected ? activeIcon : inactiveIcon,
           width: iconSize,
           height: iconSize,
           colorFilter: isSelected 
-            ? null // Don't apply color filter for active icons since they have their own color
-            : ColorFilter.mode(Colors.white, BlendMode.srcIn), // White color for inactive icons
+            ? null
+            : ColorFilter.mode(Colors.white, BlendMode.srcIn),
         ),
       ),
     );

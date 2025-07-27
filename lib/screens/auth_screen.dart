@@ -44,8 +44,8 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
             TextButton(
               child: Text("OK"),
               onPressed: () {
-                Navigator.of(context).pop(); // Dismiss the dialog
-                Navigator.of(context).pushReplacementNamed('/home'); // Navigate to MainScreen
+                Navigator.of(context).pop();
+                Navigator.of(context).pushReplacementNamed('/home');
               },
             ),
           ],

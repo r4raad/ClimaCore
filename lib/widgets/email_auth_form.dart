@@ -28,20 +28,18 @@ class _EmailAuthFormState extends State<EmailAuthForm> {
       try {
         if (_isLogin) {
           UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(email: _email, password: _password);
-          // Ensure user document exists in Firestore
           final userService = UserService();
           final firebaseUser = userCredential.user;
           if (firebaseUser != null) {
             AppUser? appUser = await userService.getUserById(firebaseUser.uid);
             if (appUser == null) {
-              // Create user document with minimal info (name unknown)
               await userService.addUser(AppUser(
                 id: firebaseUser.uid,
                 name: firebaseUser.displayName ?? '',
                 points: 0,
                 savedPosts: [],
                 likedPosts: [],
-                profilePic: null, // Default: no profile picture
+                profilePic: null,
                 actions: 0,
                 streak: 0,
                 weekPoints: 0,
@@ -52,7 +50,6 @@ class _EmailAuthFormState extends State<EmailAuthForm> {
           widget.showSuccessDialog('''Welcome Back to ClimaCore!\nYour all-in-one space to learn, act, and lead the way in climate action.''');
         } else {
           UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(email: _email, password: _password);
-          // Create user document in Firestore
           final userService = UserService();
           final firebaseUser = userCredential.user;
           if (firebaseUser != null) {
@@ -62,7 +59,7 @@ class _EmailAuthFormState extends State<EmailAuthForm> {
               points: 0,
               savedPosts: [],
               likedPosts: [],
-              profilePic: null, // Default: no profile picture
+              profilePic: null,
               actions: 0,
               streak: 0,
               weekPoints: 0,
@@ -138,7 +135,7 @@ class _EmailAuthFormState extends State<EmailAuthForm> {
             ),
             SizedBox(height: 15), 
             TextFormField(
-              decoration: InputDecoration(labelText: 'Last Name', border: OutlineInputBorder()), // Styled input
+              decoration: InputDecoration(labelText: 'Last Name', border: OutlineInputBorder()),
                validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Please enter your last name';

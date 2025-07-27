@@ -35,7 +35,6 @@ class CacheService {
       final age = now - timestamp;
       
       if (age > expiry) {
-        // Cache expired, remove it
         await prefs.remove('$_cachePrefix$key');
         return null;
       }
