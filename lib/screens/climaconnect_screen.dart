@@ -500,7 +500,6 @@ class _ClimaConnectScreenState extends State<ClimaConnectScreen> with TickerProv
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Header section
         Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
@@ -525,7 +524,6 @@ class _ClimaConnectScreenState extends State<ClimaConnectScreen> with TickerProv
           ),
         ),
         
-        // Schools list
         ListView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),

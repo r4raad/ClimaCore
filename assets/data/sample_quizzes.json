@@ -1,0 +1,167 @@
+{
+  "quizzes": [
+    {
+      "id": "climate-change-basics",
+      "title": "What is Climate Change",
+      "description": "Learn about the fundamentals of climate change and its impact on our planet.",
+      "author": "e-icon World Contest",
+      "category": "Climate Science",
+      "questionCount": 10,
+      "timeLimit": 165,
+      "points": 50,
+      "rating": 4.8,
+      "imageUrl": "assets/images/quiz/climate_basics.png",
+      "videoUrl": "https://www.youtube.com/watch?v=example",
+      "questions": [
+        {
+          "id": "cc_1",
+          "question": "What is climate change?",
+          "answers": [
+            {"id": "cc_1_a", "text": "A natural increase in weather events like rain and snow every year", "isCorrect": false},
+            {"id": "cc_1_b", "text": "The seasonal change from summer to winter and vice versa", "isCorrect": false},
+            {"id": "cc_1_c", "text": "A sudden change in local weather due to storms or floods", "isCorrect": false},
+            {"id": "cc_1_d", "text": "A long-term shift in global or regional climate patterns", "isCorrect": true},
+            {"id": "cc_1_e", "text": "A temporary increase in temperature during heatwaves", "isCorrect": false}
+          ],
+          "correctAnswerId": "cc_1_d",
+          "explanation": "Climate change refers to long-term shifts in global or regional climate patterns, including temperature, precipitation, and wind patterns.",
+          "points": 10
+        },
+        {
+          "id": "cc_2",
+          "question": "Which of the following is a greenhouse gas?",
+          "answers": [
+            {"id": "cc_2_a", "text": "Oxygen (O₂)", "isCorrect": false},
+            {"id": "cc_2_b", "text": "Nitrogen (N₂)", "isCorrect": false},
+            {"id": "cc_2_c", "text": "Carbon Dioxide (CO₂)", "isCorrect": true},
+            {"id": "cc_2_d", "text": "Hydrogen (H₂)", "isCorrect": false}
+          ],
+          "correctAnswerId": "cc_2_c",
+          "explanation": "Carbon dioxide is a major greenhouse gas that traps heat in the Earth's atmosphere.",
+          "points": 10
+        },
+        {
+          "id": "cc_3",
+          "question": "What is the main cause of current climate change?",
+          "answers": [
+            {"id": "cc_3_a", "text": "Volcanic eruptions", "isCorrect": false},
+            {"id": "cc_3_b", "text": "Human activities", "isCorrect": true},
+            {"id": "cc_3_c", "text": "Solar flares", "isCorrect": false},
+            {"id": "cc_3_d", "text": "Natural climate cycles", "isCorrect": false}
+          ],
+          "correctAnswerId": "cc_3_b",
+          "explanation": "Human activities, particularly the burning of fossil fuels, are the primary cause of current climate change.",
+          "points": 10
+        },
+        {
+          "id": "cc_4",
+          "question": "What is the greenhouse effect?",
+          "answers": [
+            {"id": "cc_4_a", "text": "A natural process that warms the Earth", "isCorrect": true},
+            {"id": "cc_4_b", "text": "A man-made warming process", "isCorrect": false},
+            {"id": "cc_4_c", "text": "A cooling effect from clouds", "isCorrect": false},
+            {"id": "cc_4_d", "text": "A type of air pollution", "isCorrect": false}
+          ],
+          "correctAnswerId": "cc_4_a",
+          "explanation": "The greenhouse effect is a natural process where certain gases in the atmosphere trap heat from the sun.",
+          "points": 10
+        },
+        {
+          "id": "cc_5",
+          "question": "Which human activity contributes most to climate change?",
+          "answers": [
+            {"id": "cc_5_a", "text": "Burning fossil fuels", "isCorrect": true},
+            {"id": "cc_5_b", "text": "Deforestation", "isCorrect": false},
+            {"id": "cc_5_c", "text": "Agriculture", "isCorrect": false},
+            {"id": "cc_5_d", "text": "Industrial processes", "isCorrect": false}
+          ],
+          "correctAnswerId": "cc_5_a",
+          "explanation": "Burning fossil fuels for energy production is the largest contributor to greenhouse gas emissions.",
+          "points": 10
+        }
+      ]
+    },
+    {
+      "id": "climate-causes",
+      "title": "Climate Change: Causes",
+      "description": "Explore the various causes of climate change and human impact on the environment.",
+      "author": "e-icon World Contest",
+      "category": "Climate Science",
+      "questionCount": 12,
+      "timeLimit": 192,
+      "points": 60,
+      "rating": 4.0,
+      "imageUrl": "assets/images/quiz/climate_causes.png",
+      "videoUrl": "https://www.youtube.com/watch?v=example2",
+      "questions": [
+        {
+          "id": "causes_1",
+          "question": "Which human activity contributes most to climate change?",
+          "answers": [
+            {"id": "causes_1_a", "text": "Burning fossil fuels", "isCorrect": true},
+            {"id": "causes_1_b", "text": "Deforestation", "isCorrect": false},
+            {"id": "causes_1_c", "text": "Agriculture", "isCorrect": false},
+            {"id": "causes_1_d", "text": "Industrial processes", "isCorrect": false}
+          ],
+          "correctAnswerId": "causes_1_a",
+          "explanation": "Burning fossil fuels for energy production is the largest contributor to greenhouse gas emissions.",
+          "points": 10
+        },
+        {
+          "id": "causes_2",
+          "question": "What is the greenhouse effect?",
+          "answers": [
+            {"id": "causes_2_a", "text": "A natural process that warms the Earth", "isCorrect": true},
+            {"id": "causes_2_b", "text": "A man-made warming process", "isCorrect": false},
+            {"id": "causes_2_c", "text": "A cooling effect from clouds", "isCorrect": false},
+            {"id": "causes_2_d", "text": "A type of air pollution", "isCorrect": false}
+          ],
+          "correctAnswerId": "causes_2_a",
+          "explanation": "The greenhouse effect is a natural process where certain gases in the atmosphere trap heat from the sun.",
+          "points": 10
+        }
+      ]
+    },
+    {
+      "id": "sdg-climate-action",
+      "title": "SDG 13: Climate Action",
+      "description": "Understanding the United Nations Sustainable Development Goal 13 and climate action initiatives.",
+      "author": "e-icon World Contest",
+      "category": "Sustainability",
+      "questionCount": 10,
+      "timeLimit": 120,
+      "points": 50,
+      "rating": 4.5,
+      "imageUrl": "assets/images/quiz/sdg13.png",
+      "videoUrl": "https://www.youtube.com/watch?v=example3",
+      "questions": [
+        {
+          "id": "sdg_1",
+          "question": "What does SDG 13 stand for?",
+          "answers": [
+            {"id": "sdg_1_a", "text": "Sustainable Development Goal 13", "isCorrect": true},
+            {"id": "sdg_1_b", "text": "Sustainable Development Group 13", "isCorrect": false},
+            {"id": "sdg_1_c", "text": "Sustainable Development Guide 13", "isCorrect": false},
+            {"id": "sdg_1_d", "text": "Sustainable Development Global 13", "isCorrect": false}
+          ],
+          "correctAnswerId": "sdg_1_a",
+          "explanation": "SDG 13 stands for Sustainable Development Goal 13, which focuses on Climate Action.",
+          "points": 10
+        },
+        {
+          "id": "sdg_2",
+          "question": "What is the main focus of SDG 13?",
+          "answers": [
+            {"id": "sdg_2_a", "text": "Economic growth", "isCorrect": false},
+            {"id": "sdg_2_b", "text": "Climate action", "isCorrect": true},
+            {"id": "sdg_2_c", "text": "Education for all", "isCorrect": false},
+            {"id": "sdg_2_d", "text": "Clean water", "isCorrect": false}
+          ],
+          "correctAnswerId": "sdg_2_b",
+          "explanation": "SDG 13 focuses on taking urgent action to combat climate change and its impacts.",
+          "points": 10
+        }
+      ]
+    }
+  ]
+} 

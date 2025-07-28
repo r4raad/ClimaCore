@@ -5,6 +5,7 @@ import 'firebase_options.dart';
 import 'screens/splash_screen.dart'; 
 import 'screens/auth_screen.dart'; 
 import 'screens/main_screen.dart';
+import 'screens/climasights_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 void main() async {

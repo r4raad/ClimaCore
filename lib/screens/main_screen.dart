@@ -6,6 +6,7 @@ import '../services/user_service.dart';
 import '../models/user.dart';
 import 'climaconnect_screen.dart';
 import 'leaderboard_screen.dart';
+import 'climasights_screen.dart';
 
 class MainScreen extends StatefulWidget {
   @override
@@ -77,7 +78,8 @@ class _MainScreenState extends State<MainScreen> {
       case 3:
         return Center(child: Text('Eco Mission Screen'));
       case 4:
-        return Center(child: Text('ClimaSights Screen'));
+        if (_appUser == null) return Center(child: Text('User not found'));
+        return ClimaSightsScreen(user: _appUser!);
       default:
         return HomeScreen();
     }

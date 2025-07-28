@@ -36,13 +36,21 @@ class SchoolService {
             );
           }
           
-          String schoolName = data['name'] ?? '';
-          if (schoolName.isEmpty) {
-            print('✅ Name field is empty, using document ID as school name: ${doc.id}');
-            schoolName = doc.id;
+          String schoolName = '';
+          for (String fieldName in data.keys) {
+            if (fieldName != 'imageUrl' && fieldName != 'createdAt' && fieldName != 'updatedAt') {
+              schoolName = fieldName.replaceAll(':', '').trim();
+              break;
+            }
           }
           
-          print('✅ Using document data for school: ${doc.id}, name: "$schoolName"');
+          if (schoolName.isEmpty) {
+            print('✅ No school name field found, using document ID as school name: ${doc.id}');
+            schoolName = doc.id;
+          } else {
+            print('✅ Found school name: "$schoolName" for document: ${doc.id}');
+          }
+          
           return School(
             id: doc.id,
             name: schoolName,
@@ -97,7 +105,14 @@ class SchoolService {
           );
         }
         
-        String schoolName = data['name'] ?? '';
+        String schoolName = '';
+        for (String fieldName in data.keys) {
+          if (fieldName != 'imageUrl' && fieldName != 'createdAt' && fieldName != 'updatedAt') {
+            schoolName = fieldName.replaceAll(':', '').trim();
+            break;
+          }
+        }
+        
         if (schoolName.isEmpty) {
           schoolName = doc.id;
         }
