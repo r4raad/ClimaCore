@@ -1,8 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../screens/ai_chat_screen.dart';
+import '../models/user.dart';
 
 class ClimaAIButton extends StatelessWidget {
+  final AppUser user;
+  
+  const ClimaAIButton({
+    Key? key,
+    required this.user,
+  }) : super(key: key);
+  
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -10,7 +18,7 @@ class ClimaAIButton extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => AIChatScreen(),
+            builder: (context) => AIChatScreen(user: user),
           ),
         );
       },

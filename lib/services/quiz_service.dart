@@ -10,10 +10,48 @@ class QuizService {
 
   static Future<List<Quiz>> getQuizzes() async {
     try {
+      print('📚 Fetching quizzes from Firebase...');
       final snapshot = await _firestore.collection('quizzes').get();
-      return snapshot.docs.map((doc) => Quiz.fromJson(doc.data())).toList();
+      print('📊 Found ${snapshot.docs.length} quiz documents');
+      
+      final quizzes = <Quiz>[];
+      
+      for (final doc in snapshot.docs) {
+        try {
+          final data = doc.data();
+          print('🏫 Processing quiz: ${doc.id}');
+          
+          // Create a quiz with the document ID as the quiz ID
+          final quiz = Quiz(
+            id: doc.id,
+            title: data['title'] ?? doc.id,
+            description: data['description'] ?? '',
+            author: data['author'] ?? 'e-icon World Contest',
+            category: data['category'] ?? 'Climate Science',
+            questionCount: data['questionCount'] ?? 0,
+            timeLimit: data['timeLimit'] ?? 300,
+            points: data['points'] ?? 30,
+            rating: (data['rating'] ?? 4.5).toDouble(),
+            imageUrl: data['imageUrl'] ?? '',
+            videoUrl: data['videoUrl'] ?? '',
+            questions: _getQuestionsForQuiz(doc.id), // Get questions based on quiz ID
+            createdAt: data['createdAt'] is Timestamp 
+                ? (data['createdAt'] as Timestamp).toDate()
+                : DateTime.now(),
+            isActive: data['isActive'] ?? true,
+          );
+          
+          quizzes.add(quiz);
+          print('✅ Added quiz: ${quiz.title}');
+        } catch (e) {
+          print('❌ Error processing quiz ${doc.id}: $e');
+        }
+      }
+      
+      print('🎉 Successfully processed ${quizzes.length} quizzes');
+      return quizzes;
     } catch (e) {
-      print('Error fetching quizzes: $e');
+      print('❌ Error fetching quizzes: $e');
       return _getSampleQuizzes();
     }
   }
@@ -22,12 +60,50 @@ class QuizService {
     try {
       final doc = await _firestore.collection('quizzes').doc(quizId).get();
       if (doc.exists) {
-        return Quiz.fromJson(doc.data()!);
+        final data = doc.data()!;
+        
+        return Quiz(
+          id: doc.id,
+          title: data['title'] ?? doc.id,
+          description: data['description'] ?? '',
+          author: data['author'] ?? 'e-icon World Contest',
+          category: data['category'] ?? 'Climate Science',
+          questionCount: data['questionCount'] ?? 0,
+          timeLimit: data['timeLimit'] ?? 300,
+          points: data['points'] ?? 30,
+          rating: (data['rating'] ?? 4.5).toDouble(),
+          imageUrl: data['imageUrl'] ?? '',
+          videoUrl: data['videoUrl'] ?? '',
+          questions: _getQuestionsForQuiz(doc.id),
+          createdAt: data['createdAt'] is Timestamp 
+              ? (data['createdAt'] as Timestamp).toDate()
+              : DateTime.now(),
+          isActive: data['isActive'] ?? true,
+        );
       }
       return null;
     } catch (e) {
       print('Error fetching quiz: $e');
       return null;
+    }
+  }
+
+  static List<QuizQuestion> _getQuestionsForQuiz(String quizId) {
+    // Return sample questions based on quiz ID
+    // In a real implementation, you would fetch these from Firebase
+    switch (quizId) {
+      case 'carbon-footprint':
+        return _getCarbonFootprintQuestions();
+      case 'climate-causes':
+        return _getClimateCausesQuestions();
+      case 'climate-change-basi...':
+        return _getClimateChangeBasicQuestions();
+      case 'renewable-energy':
+        return _getRenewableEnergyQuestions();
+      case 'sdg-climate-action':
+        return _getSDGClimateActionQuestions();
+      default:
+        return _getSampleQuestions();
     }
   }
 
@@ -45,6 +121,19 @@ class QuizService {
       return null;
     } catch (e) {
       print('Error fetching quiz progress: $e');
+      return null;
+    }
+  }
+
+  static Future<QuizProgress?> getQuizProgressById(String progressId) async {
+    try {
+      final doc = await _firestore.collection('quiz_progress').doc(progressId).get();
+      if (doc.exists) {
+        return QuizProgress.fromJson(doc.data()!);
+      }
+      return null;
+    } catch (e) {
+      print('Error fetching quiz progress by ID: $e');
       return null;
     }
   }
@@ -461,5 +550,59 @@ class QuizService {
     } catch (e) {
       print('Error updating quiz rating: $e');
     }
+  }
+
+  static List<QuizQuestion> _getClimateChangeBasicQuestions() {
+    return [
+      QuizQuestion(
+        id: 'ccb_1',
+        question: 'What is the greenhouse effect?',
+        answers: [
+          QuizAnswer(id: 'ccb_1_a', text: 'A natural process that warms the Earth', isCorrect: true),
+          QuizAnswer(id: 'ccb_1_b', text: 'A man-made process', isCorrect: false),
+          QuizAnswer(id: 'ccb_1_c', text: 'A cooling effect', isCorrect: false),
+          QuizAnswer(id: 'ccb_1_d', text: 'A type of pollution', isCorrect: false),
+        ],
+        correctAnswerId: 'ccb_1_a',
+        explanation: 'The greenhouse effect is a natural process that warms the Earth\'s surface.',
+        points: 10,
+      ),
+    ];
+  }
+
+  static List<QuizQuestion> _getSDGClimateActionQuestions() {
+    return [
+      QuizQuestion(
+        id: 'sdg_1',
+        question: 'What is SDG 13?',
+        answers: [
+          QuizAnswer(id: 'sdg_1_a', text: 'Climate Action', isCorrect: true),
+          QuizAnswer(id: 'sdg_1_b', text: 'Clean Water', isCorrect: false),
+          QuizAnswer(id: 'sdg_1_c', text: 'Quality Education', isCorrect: false),
+          QuizAnswer(id: 'sdg_1_d', text: 'No Poverty', isCorrect: false),
+        ],
+        correctAnswerId: 'sdg_1_a',
+        explanation: 'SDG 13 is Climate Action, which aims to take urgent action to combat climate change.',
+        points: 10,
+      ),
+    ];
+  }
+
+  static List<QuizQuestion> _getSampleQuestions() {
+    return [
+      QuizQuestion(
+        id: 'sample_1',
+        question: 'What is climate change?',
+        answers: [
+          QuizAnswer(id: 'sample_1_a', text: 'A long-term change in global weather patterns', isCorrect: true),
+          QuizAnswer(id: 'sample_1_b', text: 'A short-term weather event', isCorrect: false),
+          QuizAnswer(id: 'sample_1_c', text: 'A seasonal change', isCorrect: false),
+          QuizAnswer(id: 'sample_1_d', text: 'A daily temperature change', isCorrect: false),
+        ],
+        correctAnswerId: 'sample_1_a',
+        explanation: 'Climate change refers to long-term changes in global weather patterns and average temperatures.',
+        points: 10,
+      ),
+    ];
   }
 } 

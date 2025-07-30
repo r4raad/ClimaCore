@@ -27,9 +27,10 @@ class _ResilienceTabState extends State<ResilienceTab> {
     });
     
     try {
+      print('🔄 Loading real-time climate news...');
       final events = await NewsService.fetchClimateNews()
-          .timeout(Duration(seconds: 8), onTimeout: () {
-        print('News loading timeout, using fallback data');
+          .timeout(Duration(seconds: 10), onTimeout: () {
+        print('⏰ News loading timeout, using fallback data');
         return _getFallbackDisasterEvents();
       });
       
@@ -38,9 +39,10 @@ class _ResilienceTabState extends State<ResilienceTab> {
           _disasterEvents = events;
           _isLoading = false;
         });
+        print('✅ Loaded ${events.length} climate events');
       }
     } catch (e) {
-      print('Error loading disaster events: $e');
+      print('❌ Error loading disaster events: $e');
       if (mounted) {
         setState(() {
           _disasterEvents = _getFallbackDisasterEvents();
@@ -186,10 +188,18 @@ class _ResilienceTabState extends State<ResilienceTab> {
           ),
           SizedBox(height: 16),
           Text(
-            'Loading disaster events...',
+            'Fetching real-time climate news...',
             style: GoogleFonts.questrial(
               fontSize: 16,
               color: Colors.grey[600],
+            ),
+          ),
+          SizedBox(height: 8),
+          Text(
+            'This may take a few seconds',
+            style: GoogleFonts.questrial(
+              fontSize: 14,
+              color: Colors.grey[500],
             ),
           ),
         ],
@@ -235,17 +245,17 @@ class _ResilienceTabState extends State<ResilienceTab> {
     return RefreshIndicator(
       onRefresh: _loadDisasterEvents,
       child: ListView.builder(
-        padding: EdgeInsets.symmetric(horizontal: 16),
+        padding: EdgeInsets.symmetric(horizontal: 0),
         itemCount: _groupedEvents.length,
         itemBuilder: (context, index) {
           final groupKey = _groupedEvents.keys.elementAt(index);
           final events = _groupedEvents[groupKey]!;
-          
+
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
-                padding: EdgeInsets.symmetric(vertical: 16),
+                padding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
                 child: Text(
                   groupKey,
                   style: GoogleFonts.questrial(
@@ -255,16 +265,140 @@ class _ResilienceTabState extends State<ResilienceTab> {
                   ),
                 ),
               ),
-              
-              ...events.map((event) => DisasterEventCard(
-                event: event,
-                onTap: () => _showEventDetails(event),
-              )),
-              
+              ...events.map((event) => _buildEventCard(event)).toList(),
               SizedBox(height: 16),
             ],
           );
         },
+      ),
+    );
+  }
+
+  Widget _buildEventCard(DisasterEvent event) {
+    Color tagColor = _getEventTypeColor(event.type);
+    IconData iconData = Icons.warning;
+    switch (event.type.toUpperCase()) {
+      case 'LANDSLIDE':
+        iconData = Icons.terrain;
+        break;
+      case 'FLOOD':
+      case 'FLOOD: HEAVY RAIN':
+        iconData = Icons.water_damage;
+        break;
+      case 'TYPHOON':
+        iconData = Icons.cyclone;
+        break;
+      case 'EARTHQUAKE':
+        iconData = Icons.waves;
+        break;
+      case 'WILDFIRE':
+        iconData = Icons.local_fire_department;
+        break;
+      default:
+        iconData = Icons.warning;
+    }
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                decoration: BoxDecoration(
+                  color: tagColor,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  event.type.toUpperCase(),
+                  style: GoogleFonts.questrial(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13,
+                  ),
+                ),
+              ),
+              Spacer(),
+              Text(
+                'Updated: ${DateFormat('h:mm a').format(event.date)}',
+                style: GoogleFonts.questrial(
+                  color: Colors.grey[500],
+                  fontSize: 13,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 10),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CircleAvatar(
+                backgroundColor: tagColor.withOpacity(0.1),
+                child: Icon(iconData, color: tagColor),
+              ),
+              SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      event.title,
+                      style: GoogleFonts.questrial(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: Colors.grey[900],
+                      ),
+                    ),
+                    if (event.casualties.isNotEmpty || event.damage.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 2.0),
+                        child: Text(
+                          [
+                            if (event.casualties.isNotEmpty) event.casualties,
+                            if (event.damage.isNotEmpty) event.damage,
+                          ].join(', '),
+                          style: GoogleFonts.questrial(
+                            fontWeight: FontWeight.w500,
+                            fontSize: 13,
+                            color: Colors.grey[700],
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+              IconButton(
+                icon: Icon(Icons.open_in_new, color: Colors.green, size: 20),
+                onPressed: () => NewsService.launchSourceUrl(event.sourceUrl),
+                tooltip: 'Read More',
+              ),
+            ],
+          ),
+          if (event.description.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: 8.0),
+              child: Text(
+                event.description,
+                style: GoogleFonts.questrial(
+                  fontSize: 13,
+                  color: Colors.grey[800],
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }
@@ -396,7 +530,18 @@ class _ResilienceTabState extends State<ResilienceTab> {
                         SizedBox(width: 12),
                         Expanded(
                           child: OutlinedButton.icon(
-                            onPressed: () {
+                            onPressed: () async {
+                              try {
+                                await NewsService.launchSourceUrl(event.sourceUrl);
+                              } catch (e) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('Unable to open link: ${e.toString()}'),
+                                    backgroundColor: Colors.red,
+                                    duration: Duration(seconds: 3),
+                                  ),
+                                );
+                              }
                             },
                             icon: Icon(Icons.open_in_new),
                             label: Text('Read More'),

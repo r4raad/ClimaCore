@@ -84,167 +84,156 @@ class _ClimaSightsScreenState extends State<ClimaSightsScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: CustomScrollView(
-        controller: _scrollController,
-        slivers: [
-          SliverAppBar(
-            expandedHeight: _expandedHeight,
-            floating: false,
-            pinned: true,
-            backgroundColor: Colors.green,
-            flexibleSpace: LayoutBuilder(
-              builder: (context, constraints) {
-                final double maxExtent = constraints.maxHeight;
-                final double minExtent = kToolbarHeight;
-                final double t = ((maxExtent - minExtent) / (_expandedHeight - _collapsedHeight)).clamp(0.0, 1.0);
-                
-                return Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    AnimatedOpacity(
-                      opacity: t,
-                      duration: const Duration(milliseconds: 200),
-                      child: Container(
+      body: NestedScrollView(
+        headerSliverBuilder: (context, innerBoxIsScrolled) {
+          return [
+            SliverAppBar(
+              expandedHeight: _expandedHeight,
+              floating: false,
+              pinned: true,
+              backgroundColor: Colors.green,
+              flexibleSpace: LayoutBuilder(
+                builder: (context, constraints) {
+                  final double maxExtent = constraints.maxHeight;
+                  final double minExtent = kToolbarHeight;
+                  final double t = ((maxExtent - minExtent) / (_expandedHeight - _collapsedHeight)).clamp(0.0, 1.0);
+                  
+                  return Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      AnimatedOpacity(
+                        opacity: t,
+                        duration: const Duration(milliseconds: 200),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            image: DecorationImage(
+                              image: AssetImage('assets/images/logo.png'),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Container(
                         decoration: BoxDecoration(
-                          image: DecorationImage(
-                            image: AssetImage('assets/images/logo.png'),
-                            fit: BoxFit.cover,
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Colors.transparent,
+                              Colors.black.withOpacity(0.3),
+                            ],
                           ),
                         ),
                       ),
-                    ),
-                    Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                            Colors.transparent,
-                            Colors.black.withOpacity(0.3),
-                          ],
-                        ),
-                      ),
-                    ),
-                    AnimatedPositioned(
-                      duration: const Duration(milliseconds: 200),
-                      left: 0,
-                      right: 0,
-                      top: -40 * (1.0 - t),
-                      bottom: 0,
-                      child: AnimatedOpacity(
-                        opacity: t,
+                      AnimatedPositioned(
                         duration: const Duration(milliseconds: 200),
-                        child: IgnorePointer(
-                          child: Center(
-                            child: Text(
-                              'ClimaSights',
-                              style: GoogleFonts.questrial(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 28,
-                                letterSpacing: 1.2,
-                                shadows: [
-                                  Shadow(
-                                    offset: Offset(1.0, 1.0),
-                                    blurRadius: 3.0,
-                                    color: Colors.black54,
-                                  ),
-                                ],
+                        left: 0,
+                        right: 0,
+                        top: -40 * (1.0 - t),
+                        bottom: 0,
+                        child: AnimatedOpacity(
+                          opacity: t,
+                          duration: const Duration(milliseconds: 200),
+                          child: IgnorePointer(
+                            child: Center(
+                              child: Text(
+                                'ClimaSights',
+                                style: GoogleFonts.questrial(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 28,
+                                  letterSpacing: 1.2,
+                                  shadows: [
+                                    Shadow(
+                                      offset: Offset(1.0, 1.0),
+                                      blurRadius: 3.0,
+                                      color: Colors.black54,
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                    AnimatedPositioned(
-                      duration: const Duration(milliseconds: 200),
-                      left: 16,
-                      right: 0,
-                      top: 0,
-                      bottom: 0,
-                      child: AnimatedOpacity(
-                        opacity: 1.0 - t,
+                      AnimatedPositioned(
                         duration: const Duration(milliseconds: 200),
-                        child: IgnorePointer(
-                          child: Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              'ClimaSights',
-                              style: GoogleFonts.questrial(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20,
-                                letterSpacing: 1.1,
-                                shadows: [
-                                  Shadow(
-                                    offset: Offset(1.0, 1.0),
-                                    blurRadius: 3.0,
-                                    color: Colors.black54,
-                                  ),
-                                ],
+                        left: 16,
+                        right: 0,
+                        top: 0,
+                        bottom: 0,
+                        child: AnimatedOpacity(
+                          opacity: 1.0 - t,
+                          duration: const Duration(milliseconds: 200),
+                          child: IgnorePointer(
+                            child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                'ClimaSights',
+                                style: GoogleFonts.questrial(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20,
+                                  letterSpacing: 1.1,
+                                  shadows: [
+                                    Shadow(
+                                      offset: Offset(1.0, 1.0),
+                                      blurRadius: 3.0,
+                                      color: Colors.black54,
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                    AnimatedPositioned(
-                      duration: const Duration(milliseconds: 200),
-                      top: 20,
-                      right: 20,
-                      child: AnimatedOpacity(
-                        opacity: t,
+                      AnimatedPositioned(
                         duration: const Duration(milliseconds: 200),
-                        child: ClimaAIButton(),
+                        top: 20,
+                        right: 20,
+                        child: AnimatedOpacity(
+                          opacity: t,
+                          duration: const Duration(milliseconds: 200),
+                          child: ClimaAIButton(user: widget.user),
+                        ),
                       ),
-                    ),
-                  ],
-                );
-              },
-            ),
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.refresh, color: Colors.white),
-                onPressed: () {
+                    ],
+                  );
                 },
               ),
-            ],
-          ),
-          SliverToBoxAdapter(
-            child: _buildTabContent(),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTabContent() {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            Color(0xFF2E7D32),
-            Color(0xFF4CAF50),
-          ],
-        ),
-      ),
-      child: Column(
-        children: [
-          _buildTabNavigation(),
-          
-          Container(
-            height: MediaQuery.of(context).size.height - _expandedHeight - 100,
-            child: TabBarView(
-              controller: _tabController,
-              children: [
-                QuizTab(user: widget.user),
-                ResilienceTab(),
+              actions: [
+                // Removed refresh button
+              ],
+            ),
+          ];
+        },
+        body: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Color(0xFF2E7D32),
+                Color(0xFF4CAF50),
               ],
             ),
           ),
-        ],
+          child: Column(
+            children: [
+              _buildTabNavigation(),
+              Expanded(
+                child: TabBarView(
+                  controller: _tabController,
+                  children: [
+                    QuizTab(user: widget.user),
+                    ResilienceTab(),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

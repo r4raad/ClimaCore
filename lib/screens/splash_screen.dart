@@ -7,15 +7,54 @@ class SplashScreen extends StatefulWidget {
   _SplashScreenState createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
+class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMixin {
+  late AnimationController _logoController;
+  late AnimationController _textController;
+  late Animation<double> _logoScale;
+  late Animation<double> _textFade;
+  
   @override
   void initState() {
     super.initState();
+    _setupAnimations();
     _checkCurrentUser();
+  }
+  
+  void _setupAnimations() {
+    _logoController = AnimationController(
+      duration: Duration(milliseconds: 1200),
+      vsync: this,
+    );
+    
+    _textController = AnimationController(
+      duration: Duration(milliseconds: 800),
+      vsync: this,
+    );
+    
+    _logoScale = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _logoController,
+      curve: Curves.elasticOut,
+    ));
+    
+    _textFade = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _textController,
+      curve: Curves.easeInOut,
+    ));
+    
+    _logoController.forward();
+    Future.delayed(Duration(milliseconds: 600), () {
+      if (mounted) _textController.forward();
+    });
   }
 
   _checkCurrentUser() async {
-    await Future.delayed(Duration(seconds: 2)); 
+    await Future.delayed(Duration(seconds: 3)); 
     FirebaseAuth.instance.authStateChanges().listen((User? user) {
       if (user == null) {
         Navigator.pushReplacementNamed(context, '/auth');
@@ -23,6 +62,13 @@ class _SplashScreenState extends State<SplashScreen> {
         Navigator.pushReplacementNamed(context, '/home');
       }
     });
+  }
+  
+  @override
+  void dispose() {
+    _logoController.dispose();
+    _textController.dispose();
+    super.dispose();
   }
 
   @override
@@ -32,14 +78,23 @@ class _SplashScreenState extends State<SplashScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset(AppConstants.appLogoPath, height: 150), 
+            ScaleTransition(
+              scale: _logoScale,
+              child: Image.asset(AppConstants.appLogoPath, height: 150),
+            ),
             SizedBox(height: 20),
-            Text(
-              AppConstants.appName, 
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            FadeTransition(
+              opacity: _textFade,
+              child: Text(
+                AppConstants.appName, 
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
             ),
             SizedBox(height: 10),
-            Text('Empowering Change From The Core'), 
+            FadeTransition(
+              opacity: _textFade,
+              child: Text('Empowering Change From The Core'),
+            ),
           ],
         ),
       ),

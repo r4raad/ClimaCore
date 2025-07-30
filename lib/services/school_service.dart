@@ -4,6 +4,7 @@ import '../utils/performance_monitor.dart';
 
 class SchoolService {
   final CollectionReference schoolsCollection = FirebaseFirestore.instance.collection('schools');
+  final CollectionReference usersCollection = FirebaseFirestore.instance.collection('users');
   
   static List<School>? _cachedSchools;
   static DateTime? _lastCacheTime;
@@ -33,6 +34,7 @@ class SchoolService {
               id: doc.id,
               name: doc.id,
               imageUrl: null,
+              memberCount: 0,
             );
           }
           
@@ -55,8 +57,12 @@ class SchoolService {
             id: doc.id,
             name: schoolName,
             imageUrl: data['imageUrl'],
+            memberCount: 0, // Will be calculated separately
           );
         }).toList();
+        
+        // Calculate real member counts for each school
+        await _calculateMemberCounts(schools);
         
         print('🎉 Successfully processed ${schools.length} schools');
         
@@ -78,6 +84,37 @@ class SchoolService {
         rethrow;
       }
     });
+  }
+
+  Future<void> _calculateMemberCounts(List<School> schools) async {
+    try {
+      print('👥 Calculating real member counts for ${schools.length} schools...');
+      
+      for (int i = 0; i < schools.length; i++) {
+        final school = schools[i];
+        
+        // Count users who have joined this school
+        final usersSnapshot = await usersCollection
+            .where('joinedSchoolId', isEqualTo: school.id)
+            .get();
+        
+        final memberCount = usersSnapshot.docs.length;
+        print('🏫 ${school.name}: ${memberCount} members');
+        
+        // Update the school object with real member count
+        schools[i] = School(
+          id: school.id,
+          name: school.name,
+          imageUrl: school.imageUrl,
+          memberCount: memberCount,
+        );
+      }
+      
+      print('✅ Member counts calculated successfully');
+    } catch (e) {
+      print('❌ Error calculating member counts: $e');
+      // If there's an error, keep member counts as 0
+    }
   }
 
   Future<void> addSchool(School school) async {
@@ -102,6 +139,7 @@ class SchoolService {
             id: doc.id,
             name: doc.id,
             imageUrl: null,
+            memberCount: 0,
           );
         }
         
@@ -117,10 +155,18 @@ class SchoolService {
           schoolName = doc.id;
         }
         
+        // Calculate real member count for this school
+        final usersSnapshot = await usersCollection
+            .where('joinedSchoolId', isEqualTo: id)
+            .get();
+        
+        final memberCount = usersSnapshot.docs.length;
+        
         return School(
           id: doc.id,
           name: schoolName,
           imageUrl: data['imageUrl'],
+          memberCount: memberCount,
         );
       }
       return null;
@@ -140,18 +186,27 @@ class SchoolService {
       final sampleSchools = [
         School(
           id: 'school1',
-          name: 'Green Valley High School',
+          name: 'Yangdong Middle School',
           imageUrl: 'https://images.unsplash.com/photo-1523050854058-8df90110c9e1?w=400',
+          memberCount: 0, // Will be calculated from real user data
         ),
         School(
           id: 'school2',
           name: 'Eco Academy',
           imageUrl: 'https://images.unsplash.com/photo-1562774053-701939374585?w=400',
+          memberCount: 0, // Will be calculated from real user data
         ),
         School(
           id: 'school3',
           name: 'Sustainable Learning Center',
           imageUrl: 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=400',
+          memberCount: 0, // Will be calculated from real user data
+        ),
+        School(
+          id: 'school4',
+          name: 'Green Valley High School',
+          imageUrl: 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=400',
+          memberCount: 0, // Will be calculated from real user data
         ),
       ];
 

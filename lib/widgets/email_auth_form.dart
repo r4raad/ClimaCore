@@ -14,13 +14,49 @@ class EmailAuthForm extends StatefulWidget {
   _EmailAuthFormState createState() => _EmailAuthFormState();
 }
 
-class _EmailAuthFormState extends State<EmailAuthForm> {
+class _EmailAuthFormState extends State<EmailAuthForm> with TickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   String _email = '';
   String _password = '';
   String _firstName = '';
   String _lastName = '';
-  bool _isLogin = false; 
+  bool _isLogin = false;
+  late AnimationController _formController;
+  late Animation<double> _formFade;
+  late Animation<Offset> _formSlide; 
+
+  @override
+  void initState() {
+    super.initState();
+    _formController = AnimationController(
+      duration: Duration(milliseconds: 600),
+      vsync: this,
+    );
+    
+    _formFade = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _formController,
+      curve: Curves.easeOut,
+    ));
+    
+    _formSlide = Tween<Offset>(
+      begin: Offset(0, 0.2),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _formController,
+      curve: Curves.easeOut,
+    ));
+    
+    _formController.forward();
+  }
+  
+  @override
+  void dispose() {
+    _formController.dispose();
+    super.dispose();
+  }
 
   void _submit() async {
     if (_formKey.currentState!.validate()) {
@@ -35,7 +71,8 @@ class _EmailAuthFormState extends State<EmailAuthForm> {
             if (appUser == null) {
               await userService.addUser(AppUser(
                 id: firebaseUser.uid,
-                name: firebaseUser.displayName ?? '',
+                firstName: firebaseUser.displayName?.split(' ').first ?? '',
+                lastName: firebaseUser.displayName?.split(' ').skip(1).join(' ') ?? '',
                 points: 0,
                 savedPosts: [],
                 likedPosts: [],
@@ -55,7 +92,8 @@ class _EmailAuthFormState extends State<EmailAuthForm> {
           if (firebaseUser != null) {
             await userService.addUser(AppUser(
               id: firebaseUser.uid,
-              name: (_firstName + ' ' + _lastName).trim(),
+              firstName: _firstName,
+              lastName: _lastName,
               points: 0,
               savedPosts: [],
               likedPosts: [],
@@ -115,11 +153,15 @@ class _EmailAuthFormState extends State<EmailAuthForm> {
 
   @override
   Widget build(BuildContext context) {
-    return Form(
-      key: _formKey,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
+    return SlideTransition(
+      position: _formSlide,
+      child: FadeTransition(
+        opacity: _formFade,
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
           if (!_isLogin) ...[ 
             TextFormField(
               decoration: InputDecoration(labelText: 'First Name', border: OutlineInputBorder()), 
@@ -191,28 +233,41 @@ class _EmailAuthFormState extends State<EmailAuthForm> {
               ),
            ],
           SizedBox(height: 20), 
-          ElevatedButton(
-            onPressed: _submit,
-            style: ElevatedButton.styleFrom( 
-              backgroundColor: Colors.green[700], 
-              padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-              textStyle: TextStyle(fontSize: 18),
+          AnimatedContainer(
+            duration: Duration(milliseconds: 200),
+            curve: Curves.easeInOut,
+            child: ElevatedButton(
+              onPressed: _submit,
+              style: ElevatedButton.styleFrom( 
+                backgroundColor: Colors.green[700], 
+                padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                textStyle: TextStyle(fontSize: 18),
+                foregroundColor: Colors.white,
+                elevation: 4,
+                shadowColor: Colors.green.withOpacity(0.3),
+              ),
+              child: Text(_isLogin ? 'Sign In' : 'Register', style: _isLogin ? TextStyle(color: Colors.white) : widget.registerButtonTextStyle),
             ),
-            child: Text(_isLogin ? 'Sign In' : 'Register', style: _isLogin ? null : widget.registerButtonTextStyle),
           ),
-          TextButton(
-            onPressed: () {
-              setState(() {
-                _isLogin = !_isLogin;
-              });
-            },
-            child: Text(
-              _isLogin ? 'Need an account? Register Here' : 'Already have an account? Login',
-              style: TextStyle(color: Colors.green[700]), 
+          AnimatedContainer(
+            duration: Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+            child: TextButton(
+              onPressed: () {
+                setState(() {
+                  _isLogin = !_isLogin;
+                });
+              },
+              child: Text(
+                _isLogin ? 'Need an account? Register Here' : 'Already have an account? Login',
+                style: TextStyle(color: Colors.green[700]), 
+              ),
             ),
           ),
         ],
       ),
-    );
+    ),
+  ),
+);
   }
 }

@@ -35,8 +35,16 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> with SingleTicker
         });
       }
     });
-    _currentUserId = FirebaseAuth.instance.currentUser?.uid;
+    _currentUserId = FirebaseAuth.instance.currentUser?.uid ?? 'dummy_user_1';
     _loadInitialData();
+    
+    // Add timeout to prevent infinite loading
+    Future.delayed(Duration(seconds: 20), () {
+      if (mounted && _isLoading) {
+        print('⚠️ Leaderboard: Loading timeout, forcing fallback data');
+        _loadFallbackData();
+      }
+    });
   }
 
   @override
@@ -56,47 +64,81 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> with SingleTicker
     }
     
     try {
-      await _loadUsers().timeout(Duration(seconds: 10));
+      print('🔄 Leaderboard: Starting to load users...');
+      await _loadUsers().timeout(Duration(seconds: 15));
+      print('✅ Leaderboard: Users loaded successfully');
     } catch (e) {
-      print('Leaderboard loading timeout, using fallback data');
+      print('❌ Leaderboard: Loading timeout or error: $e');
+      print('📝 Leaderboard: Using fallback data');
       _loadFallbackData();
     }
   }
 
   void _loadFallbackData() {
+    print('📝 Leaderboard: Loading fallback sample data');
+    
+    // Get current user from Firebase Auth
+    final currentUser = FirebaseAuth.instance.currentUser;
+    final currentUserId = currentUser?.uid ?? 'dummy_user_1';
+    
+    // Extract first name from display name or use a default
+    String firstName = 'User';
+    if (currentUser?.displayName != null && currentUser!.displayName!.isNotEmpty) {
+      firstName = currentUser.displayName!.split(' ').first;
+    }
+    
+    // Create a basic user entry for the current user
+    final currentUserEntry = AppUser(
+      id: currentUserId,
+      firstName: firstName,
+      lastName: '',
+      points: 4245, // Sample points from UI
+      savedPosts: [],
+      likedPosts: [],
+      actions: 6, // Sample actions from UI
+      streak: 24, // Sample streak from UI
+      weekPoints: 400, // Sample week points from UI
+      weekGoal: 800,
+    );
+    
+    // Create sample users with realistic names and data
     final sampleUsers = [
+      currentUserEntry,
       AppUser(
-        id: 'sample_1',
-        name: 'Emma Johnson',
-        points: 1250,
+        id: 'user_2',
+        firstName: 'Son',
+        lastName: 'Heung-min',
+        points: 1160,
         savedPosts: [],
         likedPosts: [],
-        actions: 15,
-        streak: 7,
-        weekPoints: 320,
-        weekGoal: 500,
-      ),
-      AppUser(
-        id: 'sample_2',
-        name: 'Alex Chen',
-        points: 980,
-        savedPosts: [],
-        likedPosts: [],
-        actions: 12,
-        streak: 5,
-        weekPoints: 280,
-        weekGoal: 400,
-      ),
-      AppUser(
-        id: 'sample_3',
-        name: 'Sarah Williams',
-        points: 2100,
-        savedPosts: [],
-        likedPosts: [],
-        actions: 25,
+        actions: 16,
         streak: 12,
-        weekPoints: 450,
-        weekGoal: 600,
+        weekPoints: 1160,
+        weekGoal: 800,
+      ),
+      AppUser(
+        id: 'user_3',
+        firstName: 'Angelica',
+        lastName: 'Gomes',
+        points: 5600,
+        savedPosts: [],
+        likedPosts: [],
+        actions: 85,
+        streak: 45,
+        weekPoints: 1200,
+        weekGoal: 800,
+      ),
+      AppUser(
+        id: 'user_4',
+        firstName: 'Gong',
+        lastName: 'Yoo',
+        points: 5560,
+        savedPosts: [],
+        likedPosts: [],
+        actions: 80,
+        streak: 38,
+        weekPoints: 1100,
+        weekGoal: 800,
       ),
     ];
     
@@ -105,6 +147,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> with SingleTicker
         _cachedUsers = sampleUsers;
         _isLoading = false;
       });
+      print('✅ Leaderboard: Fallback data loaded successfully');
     }
   }
 
@@ -120,25 +163,37 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> with SingleTicker
     }
 
     try {
+      print('📊 Leaderboard: Querying Firestore for users...');
       Query query = FirebaseFirestore.instance
           .collection('users')
           .orderBy('points', descending: true)
           .limit(_pageSize);
       
       final snapshot = await query.get();
+      print('📋 Leaderboard: Found ${snapshot.docs.length} users');
       
       if (snapshot.docs.isEmpty) {
+        print('📝 Leaderboard: No users found in Firestore');
         _hasMoreData = false;
+        // Load fallback data if no users found
+        _loadFallbackData();
+        return;
       } else {
-        final newUsers = snapshot.docs.map((doc) => 
-          AppUser.fromMap(doc.id, doc.data() as Map<String, dynamic>)
-        ).toList();
+        final newUsers = snapshot.docs.map((doc) {
+          try {
+            return AppUser.fromMap(doc.id, doc.data() as Map<String, dynamic>);
+          } catch (e) {
+            print('⚠️ Leaderboard: Error parsing user ${doc.id}: $e');
+            return null;
+          }
+        }).where((user) => user != null).cast<AppUser>().toList();
         
+        print('✅ Leaderboard: Successfully parsed ${newUsers.length} users');
         _cachedUsers.addAll(newUsers);
         _lastDocument = snapshot.docs.last;
       }
     } catch (e) {
-      print('Error loading users: $e');
+      print('❌ Leaderboard: Error loading users from Firestore: $e');
       _loadFallbackData();
       return;
     }
@@ -169,19 +224,11 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> with SingleTicker
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: _selectedTab == 1
-            ? IconButton(
-                icon: Icon(Icons.arrow_back, color: Colors.black),
-                onPressed: () => Navigator.pop(context),
-              )
-            : null,
-        title: _selectedTab == 1 ? Text('Leaderboard', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)) : null,
+        leading: null, // Removed back button
+        title: null, // Removed title
         centerTitle: true,
         actions: [
-          IconButton(
-            icon: Icon(Icons.refresh, color: Colors.black),
-            onPressed: _refreshData,
-          ),
+          // Removed refresh button
         ],
         bottom: PreferredSize(
           preferredSize: Size.fromHeight(48),
@@ -238,9 +285,25 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> with SingleTicker
   }
 
   Widget _buildLoadingState() {
-    return LoadingWidget(
-      message: 'Loading leaderboard...',
-      color: Colors.green,
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+            strokeWidth: 3,
+          ),
+          SizedBox(height: 16),
+          Text(
+            'Loading leaderboard...',
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.grey[600],
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -391,13 +454,25 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> with SingleTicker
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Hello, ${(user.name).split(' ')[0]}👋', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+            Text('Hello, ${user.displayName}👋', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
             SizedBox(height: 4),
-            Text('Sat, 31 May', style: TextStyle(color: Colors.grey[600], fontSize: 14)),
+            Text(_getCurrentDate(), style: TextStyle(color: Colors.grey[600], fontSize: 14)),
           ],
         ),
       ],
     );
+  }
+
+  String _getUserFirstName(AppUser user) {
+    return user.displayName;
+  }
+
+  String _getCurrentDate() {
+    final now = DateTime.now();
+    final days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    
+    return '${days[now.weekday - 1]}, ${now.day} ${months[now.month - 1]}';
   }
 
   Widget _buildPointsCard(AppUser user) {
@@ -509,7 +584,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> with SingleTicker
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(user.name, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                Text(user.fullName, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                 SizedBox(height: 4),
                 Text('${user.actions} Actions', style: TextStyle(color: Colors.grey[600], fontSize: 12)),
               ],
@@ -549,7 +624,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> with SingleTicker
               : AssetImage('assets/images/icon.png') as ImageProvider,
           radius: 22,
         ),
-        title: Text(user.name, style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(user.fullName, style: TextStyle(fontWeight: FontWeight.bold)),
         subtitle: Text('${user.actions} Actions'),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,

@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../models/ai_message.dart';
+import '../models/user.dart';
 import '../services/ai_service.dart';
 import '../widgets/ai_message_bubble.dart';
 
 class AIChatScreen extends StatefulWidget {
+  final AppUser user;
+  
+  const AIChatScreen({
+    Key? key,
+    required this.user,
+  }) : super(key: key);
+  
   @override
   _AIChatScreenState createState() => _AIChatScreenState();
 }
@@ -164,7 +172,7 @@ class _AIChatScreenState extends State<AIChatScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Awsaf Onom',
+                            widget.user.displayName,
                             style: GoogleFonts.questrial(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
@@ -370,5 +378,9 @@ class _AIChatScreenState extends State<AIChatScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Message copied to clipboard')),
     );
+  }
+
+  String _getUserFirstName() {
+    return widget.user.displayName;
   }
 } 

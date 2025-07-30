@@ -90,7 +90,7 @@ class _QuizTabState extends State<QuizTab> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Hello, ${widget.user.name.isNotEmpty ? widget.user.name : 'User'}',
+            'Hello, ${widget.user.displayName}',
             style: GoogleFonts.questrial(
               fontSize: 18,
               color: Colors.grey[700],
@@ -110,6 +110,10 @@ class _QuizTabState extends State<QuizTab> {
         ],
       ),
     );
+  }
+
+  String _getUserFirstName() {
+    return widget.user.displayName;
   }
 
   Widget _buildLoadingIndicator() {

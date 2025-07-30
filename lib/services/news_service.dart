@@ -1,10 +1,12 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:url_launcher/url_launcher.dart';
 import '../models/disaster_event.dart';
 
 class NewsService {
-  static const String _newsApiKey = 'YOUR_NEWS_API_KEY';
-  static const String _gNewsApiKey = 'YOUR_GNEWS_API_KEY';
+  // API keys for real-time news
+  static const String _newsApiKey = '9e2a2889e5434c26a27b8575ef476643'; // Get from https://newsapi.org/
+  static const String _gNewsApiKey = '9325b82ee95c436591389f541e45d3e4'; // Get from https://gnews.io/
   
   static const String _newsApiBaseUrl = 'https://newsapi.org/v2';
   static const String _gNewsBaseUrl = 'https://gnews.io/api/v4';
@@ -46,20 +48,58 @@ class NewsService {
 
   static Future<List<DisasterEvent>> fetchClimateNews() async {
     try {
+      print('🌍 Fetching real-time climate news from APIs...');
       final List<DisasterEvent> events = [];
       
-      final newsApiEvents = await _fetchFromNewsAPI();
-      final gNewsEvents = await _fetchFromGNews();
+      // Always try to fetch from real APIs since we have valid keys
+      try {
+        final newsApiEvents = await _fetchFromNewsAPI();
+        events.addAll(newsApiEvents);
+        print('✅ NewsAPI: Fetched ${newsApiEvents.length} events');
+      } catch (e) {
+        print('❌ NewsAPI error: $e');
+      }
       
-      events.addAll(newsApiEvents);
-      events.addAll(gNewsEvents);
+      try {
+        final gNewsEvents = await _fetchFromGNews();
+        events.addAll(gNewsEvents);
+        print('✅ GNews: Fetched ${gNewsEvents.length} events');
+      } catch (e) {
+        print('❌ GNews error: $e');
+      }
       
-      events.sort((a, b) => b.date.compareTo(a.date));
+      // If we got real events, return them
+      if (events.isNotEmpty) {
+        events.sort((a, b) => b.date.compareTo(a.date));
+        print('🎉 Successfully fetched ${events.length} real climate events');
+        return events;
+      }
       
-      return events;
-    } catch (e) {
-      print('Error fetching climate news: $e');
+      // Only use sample data if both APIs fail
+      print('⚠️ Using sample data as fallback');
       return _getSampleDisasterEvents();
+    } catch (e) {
+      print('❌ Error fetching climate news: $e');
+      return _getSampleDisasterEvents();
+    }
+  }
+
+  static Future<void> launchSourceUrl(String url) async {
+    try {
+      print('🔗 Attempting to launch URL: $url');
+      final uri = Uri.parse(url);
+      
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+        print('✅ Successfully launched URL');
+      } else {
+        print('❌ Could not launch URL: $url');
+        // Show user-friendly error message
+        throw Exception('Unable to open link. Please check your internet connection.');
+      }
+    } catch (e) {
+      print('❌ Error launching URL: $e');
+      rethrow; // Re-throw to show error to user
     }
   }
 
@@ -132,9 +172,7 @@ class NewsService {
       final source = article['source']?['name'] ?? '';
 
       final disasterType = _extractDisasterType('$title $description $content');
-      
       final location = _extractLocation('$title $description $content');
-      
       final casualties = _extractCasualties('$title $description $content');
       final damage = _extractDamage('$title $description $content');
 
@@ -167,9 +205,7 @@ class NewsService {
       final source = article['source']?['name'] ?? '';
 
       final disasterType = _extractDisasterType('$title $description $content');
-      
       final location = _extractLocation('$title $description $content');
-      
       final casualties = _extractCasualties('$title $description $content');
       final damage = _extractDamage('$title $description $content');
 
@@ -245,39 +281,39 @@ class NewsService {
     return [
       DisasterEvent(
         id: '1',
-        title: 'Landslide Event',
-        description: 'Landslide with injury. Landslide intersects the Sinsa Park near its midpoint at Mile 45.4 and displaces 100 yards (90 m) of the full width of the road.',
-        location: 'Sinsa Neighbourhood Park',
-        type: 'LANDSLIDE',
-        date: DateTime.now().subtract(Duration(hours: 3)),
-        casualties: 'Injured: 12',
-        damage: 'Road displacement: 100 yards',
-        imageUrl: 'https://example.com/landslide.jpg',
-        sourceUrl: 'https://example.com/news/landslide',
+        title: 'Climate Change Impact: Record Heatwaves Across Asia',
+        description: 'Scientists report unprecedented heatwaves affecting multiple Asian countries, with temperatures reaching record highs. The extreme weather events are linked to climate change and pose significant health risks to vulnerable populations.',
+        location: 'Asia Pacific Region',
+        type: 'EXTREME WEATHER',
+        date: DateTime.now().subtract(Duration(hours: 2)),
+        casualties: 'Thousands affected by heat stress',
+        damage: 'Agricultural losses estimated at millions',
+        imageUrl: 'https://images.unsplash.com/photo-1562157873-818bc0726f68?w=800',
+        sourceUrl: 'https://www.reuters.com/environment/climate-change/',
       ),
       DisasterEvent(
         id: '2',
-        title: 'FLOOD: Heavy Rain Event',
-        description: 'Flood with injury. INC 0087. Highest rainfall in 80 years. 2,800 buildings were damaged, Killed: 9 and 163 people homeless.',
-        location: 'Gangnam, Seoul',
-        type: 'FLOOD: Heavy Rain',
-        date: DateTime.now().subtract(Duration(hours: 6)),
-        casualties: 'Death: 9, Damage: 2800 Buildings',
-        damage: '2,800 buildings damaged',
-        imageUrl: 'https://example.com/flood.jpg',
-        sourceUrl: 'https://example.com/news/flood',
+        title: 'Rising Sea Levels Threaten Coastal Communities',
+        description: 'New research shows accelerated sea level rise affecting coastal communities worldwide. Small island nations and low-lying coastal areas are particularly vulnerable to this climate change impact.',
+        location: 'Global Coastal Areas',
+        type: 'CLIMATE EVENT',
+        date: DateTime.now().subtract(Duration(hours: 4)),
+        casualties: 'Millions at risk of displacement',
+        damage: 'Infrastructure damage in coastal regions',
+        imageUrl: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800',
+        sourceUrl: 'https://www.nationalgeographic.com/environment/',
       ),
       DisasterEvent(
         id: '3',
-        title: 'TYPHOON: Beblinca',
-        description: 'The typhoon did not make direct landfall in South Korea. On September 15th, 2024 at 6:00 pm it had the shortest distance at about 167 km south of Seogwipo in Jeju-do.',
-        location: 'Pacific Ocean',
-        type: 'TYPHOON: Beblinca',
-        date: DateTime.now().subtract(Duration(days: 1)),
-        casualties: '6 people dead, 11 injured, and 26 missing',
-        damage: 'Significant coastal damage',
-        imageUrl: 'https://example.com/typhoon.jpg',
-        sourceUrl: 'https://example.com/news/typhoon',
+        title: 'Renewable Energy Adoption Accelerates Globally',
+        description: 'Solar and wind energy installations reach new records as countries transition to clean energy sources. This shift is crucial for meeting climate targets and reducing greenhouse gas emissions.',
+        location: 'Global',
+        type: 'SUSTAINABILITY',
+        date: DateTime.now().subtract(Duration(hours: 6)),
+        casualties: 'Positive impact on climate goals',
+        damage: 'Reduced carbon emissions',
+        imageUrl: 'https://images.unsplash.com/photo-1466611653911-95081537e5b7?w=800',
+        sourceUrl: 'https://www.bloomberg.com/news/articles/',
       ),
     ];
   }

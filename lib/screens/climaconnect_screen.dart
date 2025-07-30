@@ -215,8 +215,11 @@ class _ClimaConnectScreenState extends State<ClimaConnectScreen> with TickerProv
 
   @override
   Widget build(BuildContext context) {
-    print('🎨 ClimaConnect: Building body - loading: $_isLoading, error: $_hasError, schools count: ${_schools.length}');
-    
+    // If user has joined a school, show the community screen directly
+    if (_joinedSchoolId != null && _joinedSchoolId!.isNotEmpty) {
+      return CommunityScreen(user: widget.user, schoolId: _joinedSchoolId!);
+    }
+    // Otherwise, show the school list
     return Scaffold(
       body: CustomScrollView(
         controller: _scrollController,
@@ -356,18 +359,7 @@ class _ClimaConnectScreenState extends State<ClimaConnectScreen> with TickerProv
               },
             ),
             actions: [
-              IconButton(
-                icon: const Icon(Icons.refresh, color: Colors.white),
-                onPressed: _fetchSchools,
-              ),
-              IconButton(
-                icon: const Icon(Icons.add, color: Colors.white),
-                onPressed: () async {
-                  await _schoolService.createSampleSchools();
-                  _fetchSchools();
-                },
-                tooltip: 'Create Sample Schools',
-              ),
+              // Removed refresh and create sample schools buttons
             ],
           ),
           SliverToBoxAdapter(

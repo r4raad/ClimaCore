@@ -13,14 +13,27 @@ class MainScreen extends StatefulWidget {
   _MainScreenState createState() => _MainScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> {
+class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   int _selectedIndex = 0;
   AppUser? _appUser;
   bool _loadingUser = true;
+  late AnimationController _animationController;
+  late Animation<double> _fadeAnimation;
 
   @override
   void initState() {
     super.initState();
+    _animationController = AnimationController(
+      duration: Duration(milliseconds: 300),
+      vsync: this,
+    );
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeInOut,
+    ));
     _loadUser();
   }
 
@@ -48,9 +61,20 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+    if (_selectedIndex != index) {
+      _animationController.reverse().then((_) {
+        setState(() {
+          _selectedIndex = index;
+        });
+        _animationController.forward();
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
   }
 
   @override
@@ -58,8 +82,17 @@ class _MainScreenState extends State<MainScreen> {
     if (_loadingUser) {
       return Scaffold(body: Center(child: CircularProgressIndicator()));
     }
+    
+    // Start the animation when the widget is first built
+    if (!_animationController.isAnimating && _animationController.value == 0.0) {
+      _animationController.forward();
+    }
+    
     return Scaffold(
-      body: _getScreen(_selectedIndex),
+      body: FadeTransition(
+        opacity: _fadeAnimation,
+        child: _getScreen(_selectedIndex),
+      ),
       bottomNavigationBar: buildBottomNavigationBar(),
       floatingActionButton: _buildFloatingNavItem(2, 'assets/icons/leaderboard_active.svg', 'assets/icons/leaderboard_inactive.svg'),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
@@ -69,7 +102,8 @@ class _MainScreenState extends State<MainScreen> {
   Widget _getScreen(int index) {
     switch (index) {
       case 0:
-        return HomeScreen();
+        if (_appUser == null) return Center(child: Text('User not found'));
+        return HomeScreen(user: _appUser!);
       case 1:
         if (_appUser == null) return Center(child: Text('User not found'));
         return ClimaConnectScreen(user: _appUser!);
@@ -81,7 +115,8 @@ class _MainScreenState extends State<MainScreen> {
         if (_appUser == null) return Center(child: Text('User not found'));
         return ClimaSightsScreen(user: _appUser!);
       default:
-        return HomeScreen();
+        if (_appUser == null) return Center(child: Text('User not found'));
+        return HomeScreen(user: _appUser!);
     }
   }
 
@@ -109,15 +144,22 @@ class _MainScreenState extends State<MainScreen> {
     final bool isSelected = _selectedIndex == index;
     final double iconSize = 30;
 
-    return GestureDetector(
-      onTap: () => _onItemTapped(index),
-      child: SvgPicture.asset(
-        isSelected ? activeIcon : inactiveIcon,
-        width: iconSize,
-        height: iconSize,
-        colorFilter: isSelected 
-          ? null
-          : ColorFilter.mode(Colors.grey, BlendMode.srcIn),
+    return AnimatedContainer(
+      duration: Duration(milliseconds: 200),
+      curve: Curves.easeInOut,
+      child: GestureDetector(
+        onTap: () => _onItemTapped(index),
+        child: Transform.scale(
+          scale: isSelected ? 1.1 : 1.0,
+          child: SvgPicture.asset(
+            isSelected ? activeIcon : inactiveIcon,
+            width: iconSize,
+            height: iconSize,
+            colorFilter: isSelected 
+              ? null
+              : ColorFilter.mode(Colors.grey, BlendMode.srcIn),
+          ),
+        ),
       ),
     );
   }
@@ -126,29 +168,36 @@ class _MainScreenState extends State<MainScreen> {
     final bool isSelected = _selectedIndex == index;
     final double iconSize = 36;
 
-    return GestureDetector(
-      onTap: () => _onItemTapped(index),
-      child: Container(
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: isSelected ? Colors.green : Colors.grey,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.3),
-              spreadRadius: 2,
-              blurRadius: 8,
-              offset: Offset(0, 3),
+    return AnimatedContainer(
+      duration: Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+      child: GestureDetector(
+        onTap: () => _onItemTapped(index),
+        child: Transform.scale(
+          scale: isSelected ? 1.15 : 1.0,
+          child: Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: isSelected ? Colors.green : Colors.grey,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(isSelected ? 0.4 : 0.3),
+                  spreadRadius: isSelected ? 3 : 2,
+                  blurRadius: isSelected ? 12 : 8,
+                  offset: Offset(0, isSelected ? 4 : 3),
+                ),
+              ],
             ),
-          ],
-        ),
-        padding: EdgeInsets.all(10),
-        child: SvgPicture.asset(
-          isSelected ? activeIcon : inactiveIcon,
-          width: iconSize,
-          height: iconSize,
-          colorFilter: isSelected 
-            ? null
-            : ColorFilter.mode(Colors.white, BlendMode.srcIn),
+            padding: EdgeInsets.all(10),
+            child: SvgPicture.asset(
+              isSelected ? activeIcon : inactiveIcon,
+              width: iconSize,
+              height: iconSize,
+              colorFilter: isSelected 
+                ? null
+                : ColorFilter.mode(Colors.white, BlendMode.srcIn),
+            ),
+          ),
         ),
       ),
     );
