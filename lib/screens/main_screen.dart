@@ -7,6 +7,7 @@ import '../models/user.dart';
 import 'climaconnect_screen.dart';
 import 'leaderboard_screen.dart';
 import 'climasights_screen.dart';
+import 'climagame_screen.dart';
 
 class MainScreen extends StatefulWidget {
   @override
@@ -110,7 +111,8 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
       case 2:
         return LeaderboardScreen();
       case 3:
-        return Center(child: Text('Eco Mission Screen'));
+        if (_appUser == null) return Center(child: Text('User not found'));
+        return ClimaGameScreen(user: _appUser!);
       case 4:
         if (_appUser == null) return Center(child: Text('User not found'));
         return ClimaSightsScreen(user: _appUser!);
