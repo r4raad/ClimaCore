@@ -5,10 +5,7 @@ import 'package:geolocator/geolocator.dart';
 import '../models/ecore.dart';
 import '../models/user.dart';
 import '../services/climagame_service.dart';
-import '../services/user_service.dart';
-import '../services/school_service.dart';
 import 'mission_detail_screen.dart';
-import 'mission_proof_screen.dart';
 
 class ClimaGameScreen extends StatefulWidget {
   final AppUser user;
@@ -24,7 +21,6 @@ class ClimaGameScreen extends StatefulWidget {
 
 class _ClimaGameScreenState extends State<ClimaGameScreen> with TickerProviderStateMixin {
   late TabController _tabController;
-  int _selectedTab = 0;
   
   List<Ecore> _ecores = [];
   List<Map<String, dynamic>> _schoolRankings = [];
@@ -37,7 +33,6 @@ class _ClimaGameScreenState extends State<ClimaGameScreen> with TickerProviderSt
   
   // Animation controllers
   late AnimationController _pulseController;
-  late Animation<double> _pulseAnimation;
 
   @override
   void initState() {
@@ -45,7 +40,7 @@ class _ClimaGameScreenState extends State<ClimaGameScreen> with TickerProviderSt
     _tabController = TabController(length: 2, vsync: this);
     _tabController.addListener(() {
       setState(() {
-        _selectedTab = _tabController.index;
+        // _selectedTab = _tabController.index; // Removed unused field
       });
     });
     
@@ -53,15 +48,15 @@ class _ClimaGameScreenState extends State<ClimaGameScreen> with TickerProviderSt
       duration: const Duration(seconds: 2),
       vsync: this,
     );
-    _pulseAnimation = Tween<double>(
-      begin: 0.8,
-      end: 1.2,
-    ).animate(CurvedAnimation(
-      parent: _pulseController,
-      curve: Curves.easeInOut,
-    ));
+    // _pulseAnimation = Tween<double>( // Removed unused field
+    //   begin: 0.8,
+    //   end: 1.2,
+    // ).animate(CurvedAnimation(
+    //   parent: _pulseController,
+    //   curve: Curves.easeInOut,
+    // ));
     
-    _pulseController.repeat(reverse: true);
+    // _pulseController.repeat(reverse: true); // Removed unused field
     _loadData();
     _getCurrentLocation();
   }
@@ -151,7 +146,7 @@ class _ClimaGameScreenState extends State<ClimaGameScreen> with TickerProviderSt
         Marker(
           markerId: const MarkerId('user'),
           position: LatLng(_currentPosition!.latitude, _currentPosition!.longitude),
-          icon: BitmapDescriptor.defaultCircleWithHue(BitmapDescriptor.hueBlue),
+          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
           infoWindow: InfoWindow(
             title: widget.user.displayName,
             snippet: widget.user.joinedSchoolId != null ? 'Team Member' : 'No Team',

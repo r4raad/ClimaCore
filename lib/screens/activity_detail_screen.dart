@@ -99,7 +99,7 @@ class _ActivityDetailScreenState extends State<ActivityDetailScreen> {
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+        children: [
             // Activity image
             if (widget.activity.imageUrl != null)
               Container(
@@ -107,7 +107,7 @@ class _ActivityDetailScreenState extends State<ActivityDetailScreen> {
                 width: double.infinity,
                 child: Image.network(
                   widget.activity.imageUrl!,
-                  fit: BoxFit.cover,
+                fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) {
                     return Container(
                       height: 200,
@@ -252,7 +252,7 @@ class _ActivityDetailScreenState extends State<ActivityDetailScreen> {
     return Padding(
       padding: EdgeInsets.only(bottom: 12),
       child: Row(
-        children: [
+            children: [
           Icon(icon, color: Colors.green, size: 20),
           SizedBox(width: 12),
           Text(
@@ -262,8 +262,8 @@ class _ActivityDetailScreenState extends State<ActivityDetailScreen> {
               color: Colors.grey[700],
             ),
           ),
-          Expanded(
-            child: Text(
+              Expanded(
+                child: Text(
               value,
               style: TextStyle(
                 fontWeight: FontWeight.w600,
