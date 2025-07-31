@@ -138,6 +138,32 @@ class QuizService {
     }
   }
 
+  static Future<List<QuizProgress>> getUserQuizProgress(String userId) async {
+    try {
+      final snapshot = await _firestore
+          .collection('quiz_progress')
+          .where('userId', isEqualTo: userId)
+          .where('isCompleted', isEqualTo: true)
+          .orderBy('completedAt', descending: true)
+          .get();
+      
+      final progressList = <QuizProgress>[];
+      for (final doc in snapshot.docs) {
+        try {
+          final progress = QuizProgress.fromJson(doc.data());
+          progressList.add(progress);
+        } catch (e) {
+          print('Error parsing quiz progress: $e');
+        }
+      }
+      
+      return progressList;
+    } catch (e) {
+      print('Error fetching user quiz progress: $e');
+      return [];
+    }
+  }
+
   static Future<void> saveQuizProgress(QuizProgress progress) async {
     try {
       await _firestore

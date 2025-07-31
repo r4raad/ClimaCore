@@ -5,16 +5,18 @@ import 'dart:io';
 import '../models/ecore.dart';
 import '../models/user.dart';
 import '../services/climagame_service.dart';
+import '../services/image_upload_service.dart';
+import 'dart:typed_data';
 
 class MissionProofScreen extends StatefulWidget {
-  final EcoreMission mission;
   final Ecore ecore;
+  final EcoreMission mission;
   final AppUser user;
 
   const MissionProofScreen({
     Key? key,
-    required this.mission,
     required this.ecore,
+    required this.mission,
     required this.user,
   }) : super(key: key);
 
@@ -23,9 +25,10 @@ class MissionProofScreen extends StatefulWidget {
 }
 
 class _MissionProofScreenState extends State<MissionProofScreen> {
-  File? _selectedImage;
-  bool _isSubmitting = false;
   final ImagePicker _picker = ImagePicker();
+  File? _selectedImage;
+  Uint8List? _selectedImageBytes;
+  bool _isSubmitting = false;
 
   @override
   Widget build(BuildContext context) {
@@ -133,7 +136,7 @@ class _MissionProofScreenState extends State<MissionProofScreen> {
             const SizedBox(height: 24),
             
             // Photo Preview
-            if (_selectedImage != null) ...[
+            if (_selectedImage != null || _selectedImageBytes != null) ...[
               Container(
                 width: double.infinity,
                 height: 300,
@@ -149,10 +152,15 @@ class _MissionProofScreenState extends State<MissionProofScreen> {
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(12),
-                  child: Image.file(
-                    _selectedImage!,
-                    fit: BoxFit.cover,
-                  ),
+                  child: _selectedImage != null
+                      ? Image.file(
+                          _selectedImage!,
+                          fit: BoxFit.cover,
+                        )
+                      : Image.memory(
+                          _selectedImageBytes!,
+                          fit: BoxFit.cover,
+                        ),
                 ),
               ),
               const SizedBox(height: 16),
@@ -198,7 +206,7 @@ class _MissionProofScreenState extends State<MissionProofScreen> {
             const SizedBox(height: 24),
             
             // Submit Button
-            if (_selectedImage != null)
+            if (_selectedImage != null || _selectedImageBytes != null)
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -250,14 +258,11 @@ class _MissionProofScreenState extends State<MissionProofScreen> {
 
   Future<void> _takePhoto() async {
     try {
-      final XFile? photo = await _picker.pickImage(
-        source: ImageSource.camera,
-        imageQuality: 80,
-      );
-      
-      if (photo != null) {
+      final imageBytes = await ImageUploadService.takePhotoWithCamera();
+      if (imageBytes != null) {
         setState(() {
-          _selectedImage = File(photo.path);
+          _selectedImageBytes = imageBytes;
+          _selectedImage = null;
         });
       }
     } catch (e) {
@@ -267,14 +272,11 @@ class _MissionProofScreenState extends State<MissionProofScreen> {
 
   Future<void> _pickFromGallery() async {
     try {
-      final XFile? image = await _picker.pickImage(
-        source: ImageSource.gallery,
-        imageQuality: 80,
-      );
-      
-      if (image != null) {
+      final imageFile = await ImageUploadService.pickImageFromGallery();
+      if (imageFile != null) {
         setState(() {
-          _selectedImage = File(image.path);
+          _selectedImage = imageFile;
+          _selectedImageBytes = null;
         });
       }
     } catch (e) {
@@ -283,7 +285,7 @@ class _MissionProofScreenState extends State<MissionProofScreen> {
   }
 
   Future<void> _submitMission() async {
-    if (_selectedImage == null) {
+    if (_selectedImage == null && _selectedImageBytes == null) {
       _showErrorSnackBar('Please take a photo first');
       return;
     }
@@ -293,24 +295,41 @@ class _MissionProofScreenState extends State<MissionProofScreen> {
     });
 
     try {
-      // In a real app, you would upload the image to Firebase Storage
-      // For now, we'll use a placeholder URL
-      final proofImageUrl = 'https://via.placeholder.com/400x300/4CAF50/FFFFFF?text=Mission+Proof';
+      String? proofImageUrl;
       
-      final success = await ClimaGameService.completeMission(
-        ecoreId: widget.ecore.id,
-        missionId: widget.mission.id,
-        userId: widget.user.id,
-        userName: widget.user.displayName,
-        proofImageUrl: proofImageUrl,
-      );
+      // Upload image to Supabase
+      if (_selectedImage != null) {
+        proofImageUrl = await ImageUploadService.uploadMissionProofImage(
+          missionId: widget.mission.id,
+          userId: widget.user.id,
+          imageFile: _selectedImage,
+        );
+      } else if (_selectedImageBytes != null) {
+        proofImageUrl = await ImageUploadService.uploadMissionProofImage(
+          missionId: widget.mission.id,
+          userId: widget.user.id,
+          imageBytes: _selectedImageBytes,
+        );
+      }
+      
+      if (proofImageUrl != null) {
+        final success = await ClimaGameService.completeMission(
+          ecoreId: widget.ecore.id,
+          missionId: widget.mission.id,
+          userId: widget.user.id,
+          userName: widget.user.displayName,
+          proofImageUrl: proofImageUrl,
+        );
 
-      if (success) {
-        _showSuccessSnackBar('Mission completed successfully!');
-        Navigator.pop(context); // Go back to mission detail
-        Navigator.pop(context); // Go back to map
+        if (success) {
+          _showSuccessSnackBar('Mission completed successfully!');
+          Navigator.pop(context); // Go back to mission detail
+          Navigator.pop(context); // Go back to map
+        } else {
+          _showErrorSnackBar('Failed to complete mission. Please try again.');
+        }
       } else {
-        _showErrorSnackBar('Failed to complete mission. Please try again.');
+        _showErrorSnackBar('Failed to upload proof image. Please try again.');
       }
     } catch (e) {
       _showErrorSnackBar('Error: $e');

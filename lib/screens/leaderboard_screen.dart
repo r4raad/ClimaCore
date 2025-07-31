@@ -4,9 +4,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../models/user.dart';
 import '../widgets/loading_widget.dart';
 import '../services/user_service.dart';
+import '../constants.dart';
 
 class LeaderboardScreen extends StatefulWidget {
-  const LeaderboardScreen({Key? key}) : super(key: key);
+  final AppUser user;
+
+  const LeaderboardScreen({
+    Key? key,
+    required this.user,
+  }) : super(key: key);
 
   @override
   State<LeaderboardScreen> createState() => _LeaderboardScreenState();
@@ -75,11 +81,11 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> with SingleTicker
   }
 
   void _loadFallbackData() {
-    print('📝 Leaderboard: Loading fallback sample data');
+    print('📝 Leaderboard: Loading fallback data from Firestore...');
     
     // Get current user from Firebase Auth
     final currentUser = FirebaseAuth.instance.currentUser;
-    final currentUserId = currentUser?.uid ?? 'dummy_user_1';
+    final currentUserId = currentUser?.uid ?? 'current_user';
     
     // Extract first name from display name or use a default
     String firstName = 'User';
@@ -87,60 +93,22 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> with SingleTicker
       firstName = currentUser.displayName!.split(' ').first;
     }
     
-    // Create a basic user entry for the current user
+    // Create a basic user entry for the current user with 0 points
     final currentUserEntry = AppUser(
       id: currentUserId,
       firstName: firstName,
       lastName: '',
-      points: 4245, // Sample points from UI
+      points: 0, // Start with 0 points for new users
       savedPosts: [],
       likedPosts: [],
-      actions: 6, // Sample actions from UI
-      streak: 24, // Sample streak from UI
-      weekPoints: 400, // Sample week points from UI
+      actions: 0, // Start with 0 actions for new users
+      streak: 0, // Start with 0 streak for new users
+      weekPoints: 0, // Start with 0 week points for new users
       weekGoal: 800,
     );
     
-    // Create sample users with realistic names and data
-    final sampleUsers = [
-      currentUserEntry,
-      AppUser(
-        id: 'user_2',
-        firstName: 'Son',
-        lastName: 'Heung-min',
-        points: 1160,
-        savedPosts: [],
-        likedPosts: [],
-        actions: 16,
-        streak: 12,
-        weekPoints: 1160,
-        weekGoal: 800,
-      ),
-      AppUser(
-        id: 'user_3',
-        firstName: 'Angelica',
-        lastName: 'Gomes',
-        points: 5600,
-        savedPosts: [],
-        likedPosts: [],
-        actions: 85,
-        streak: 45,
-        weekPoints: 1200,
-        weekGoal: 800,
-      ),
-      AppUser(
-        id: 'user_4',
-        firstName: 'Gong',
-        lastName: 'Yoo',
-        points: 5560,
-        savedPosts: [],
-        likedPosts: [],
-        actions: 80,
-        streak: 38,
-        weekPoints: 1100,
-        weekGoal: 800,
-      ),
-    ];
+    // Only show current user if no other users exist
+    final sampleUsers = [currentUserEntry];
     
     if (mounted) {
       setState(() {
@@ -174,9 +142,12 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> with SingleTicker
       
       if (snapshot.docs.isEmpty) {
         print('📝 Leaderboard: No users found in Firestore');
-        _hasMoreData = false;
-        // Load fallback data if no users found
-        _loadFallbackData();
+        if (mounted) {
+          setState(() {
+            _cachedUsers = [];
+            _isLoading = false;
+          });
+        }
         return;
       } else {
         final newUsers = snapshot.docs.map((doc) {
@@ -330,36 +301,14 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> with SingleTicker
                 child: Text('Retry'),
               ),
               SizedBox(width: 12),
-              ElevatedButton(
-                onPressed: () async {
-                  if (mounted) {
-                    setState(() {
-                      _isLoading = true;
-                    });
-                  }
-                  try {
-                    await _userService.createDummyUsers();
-                    await _refreshData();
-                  } catch (e) {
-                    if (mounted) {
-                      setState(() {
-                        _isLoading = false;
-                      });
-                    }
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Failed to create dummy users: $e'),
-                        backgroundColor: Colors.red,
-                      ),
-                    );
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  foregroundColor: Colors.white,
-                ),
-                child: Text('Create Demo Data'),
+                          Text(
+              'No users found in the leaderboard.',
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey[600],
               ),
+              textAlign: TextAlign.center,
+            ),
             ],
           ),
         ],
@@ -448,7 +397,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> with SingleTicker
           radius: 28,
           backgroundImage: user.profilePic != null && user.profilePic!.isNotEmpty
               ? NetworkImage(user.profilePic!)
-              : AssetImage('assets/images/icon.png') as ImageProvider,
+              : AssetImage(AppConstants.appLogoPath) as ImageProvider,
         ),
         SizedBox(width: 16),
         Column(
@@ -577,7 +526,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> with SingleTicker
             radius: 22,
             backgroundImage: user.profilePic != null && user.profilePic!.isNotEmpty
                 ? NetworkImage(user.profilePic!)
-                : AssetImage('assets/images/icon.png') as ImageProvider,
+                : AssetImage(AppConstants.appLogoPath) as ImageProvider,
           ),
           SizedBox(width: 16),
           Expanded(
@@ -621,7 +570,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> with SingleTicker
         leading: CircleAvatar(
           backgroundImage: user.profilePic != null && user.profilePic!.isNotEmpty
               ? NetworkImage(user.profilePic!)
-              : AssetImage('assets/images/icon.png') as ImageProvider,
+              : AssetImage(AppConstants.appLogoPath) as ImageProvider,
           radius: 22,
         ),
         title: Text(user.fullName, style: TextStyle(fontWeight: FontWeight.bold)),

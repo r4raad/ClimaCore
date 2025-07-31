@@ -112,10 +112,6 @@ class _QuizTabState extends State<QuizTab> {
     );
   }
 
-  String _getUserFirstName() {
-    return widget.user.displayName;
-  }
-
   Widget _buildLoadingIndicator() {
     return Center(
       child: Column(
@@ -158,25 +154,10 @@ class _QuizTabState extends State<QuizTab> {
             if (_continueQuizzes.isNotEmpty) ...[
               _buildSectionHeader('Continue Quiz'),
               SizedBox(height: 12),
-              ..._continueQuizzes.map((progress) {
-                final quiz = _quizzes.firstWhere(
-                  (q) => q.id == progress.quizId,
-                  orElse: () => Quiz(
-                    id: '',
-                    title: 'Unknown Quiz',
-                    description: '',
-                    author: '',
-                    category: '',
-                    questionCount: 0,
-                    timeLimit: 0,
-                    points: 0,
-                    rating: 0,
-                    imageUrl: '',
-                    videoUrl: '',
-                    questions: [],
-                    createdAt: DateTime.now(),
-                  ),
-                );
+              ..._continueQuizzes.where((progress) {
+                return _quizzes.any((q) => q.id == progress.quizId);
+              }).map((progress) {
+                final quiz = _quizzes.firstWhere((q) => q.id == progress.quizId);
                 return QuizProgressCard(
                   quiz: quiz,
                   progress: progress,

@@ -45,19 +45,21 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
       try {
         final user = await UserService().getUserById(firebaseUser.uid);
         print('User loaded: $user');
-        setState(() {
-          _appUser = user;
-          _loadingUser = false;
-        });
+        if (mounted) {
+          setState(() {
+            _appUser = user;
+            _loadingUser = false;
+          });
+        }
       } catch (e, stack) {
         print('Error loading user: $e');
         print(stack);
-        setState(() {
+        if (mounted) setState(() {
           _loadingUser = false;
         });
       }
     } else {
-      setState(() { _loadingUser = false; });
+      if (mounted) setState(() { _loadingUser = false; });
     }
   }
 
@@ -109,7 +111,8 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
         if (_appUser == null) return Center(child: Text('User not found'));
         return ClimaConnectScreen(user: _appUser!);
       case 2:
-        return LeaderboardScreen();
+        if (_appUser == null) return Center(child: Text('User not found'));
+        return LeaderboardScreen(user: _appUser!);
       case 3:
         if (_appUser == null) return Center(child: Text('User not found'));
         return ClimaGameScreen(user: _appUser!);

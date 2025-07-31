@@ -39,7 +39,7 @@ class _ClimaGameScreenState extends State<ClimaGameScreen> with TickerProviderSt
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
     _tabController.addListener(() {
-      setState(() {
+      if (mounted) setState(() {
         // _selectedTab = _tabController.index; // Removed unused field
       });
     });
@@ -71,7 +71,7 @@ class _ClimaGameScreenState extends State<ClimaGameScreen> with TickerProviderSt
 
   Future<void> _loadData() async {
     try {
-      setState(() {
+      if (mounted) setState(() {
         _isLoading = true;
         _hasError = false;
       });
@@ -81,16 +81,18 @@ class _ClimaGameScreenState extends State<ClimaGameScreen> with TickerProviderSt
         ClimaGameService.getSchoolRankings(),
       ]);
 
-      setState(() {
-        _ecores = results[0] as List<Ecore>;
-        _schoolRankings = results[1] as List<Map<String, dynamic>>;
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _ecores = results[0] as List<Ecore>;
+          _schoolRankings = results[1] as List<Map<String, dynamic>>;
+          _isLoading = false;
+        });
+      }
 
       _createMapMarkers();
     } catch (e) {
       print('❌ ClimaGameScreen: Error loading data: $e');
-      setState(() {
+      if (mounted) setState(() {
         _isLoading = false;
         _hasError = true;
       });
@@ -120,7 +122,7 @@ class _ClimaGameScreenState extends State<ClimaGameScreen> with TickerProviderSt
       }
 
       Position position = await Geolocator.getCurrentPosition();
-      setState(() {
+      if (mounted) setState(() {
         _currentPosition = position;
       });
 
@@ -170,7 +172,7 @@ class _ClimaGameScreenState extends State<ClimaGameScreen> with TickerProviderSt
       );
     }
 
-    setState(() {
+    if (mounted) setState(() {
       _markers = markers;
     });
   }
@@ -574,36 +576,37 @@ class _ClimaGameScreenState extends State<ClimaGameScreen> with TickerProviderSt
           ),
         ),
         
-        // Create Sample Data Button (for testing)
-        Positioned(
-          bottom: 16,
-          left: 16,
-          child: FloatingActionButton.extended(
-            onPressed: () async {
-              try {
-                await ClimaGameService.createSampleEcores();
-                _loadData();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Sample ecores created!'),
-                    backgroundColor: Colors.green,
-                  ),
-                );
-              } catch (e) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Error: $e'),
-                    backgroundColor: Colors.red,
-                  ),
-                );
-              }
-            },
-            backgroundColor: Colors.green,
-            foregroundColor: Colors.white,
-            icon: const Icon(Icons.add),
-            label: const Text('Create Sample Data'),
-          ),
-        ),
+        // Placeholder for Google Maps API Key
+        // TODO: Insert your Google Maps API Key here when available
+        // Positioned(
+        //   bottom: 16,
+        //   left: 16,
+        //   child: FloatingActionButton.extended(
+        //     onPressed: () async {
+        //       try {
+        //         await ClimaGameService.createSampleEcores();
+        //         _loadData();
+        //         ScaffoldMessenger.of(context).showSnackBar(
+        //           const SnackBar(
+        //             content: Text('Sample ecores created!'),
+        //             backgroundColor: Colors.green,
+        //           ),
+        //         );
+        //       } catch (e) {
+        //         ScaffoldMessenger.of(context).showSnackBar(
+        //           SnackBar(
+        //             content: Text('Error: $e'),
+        //             backgroundColor: Colors.red,
+        //           ),
+        //         );
+        //       }
+        //     },
+        //     backgroundColor: Colors.green,
+        //     foregroundColor: Colors.white,
+        //     icon: const Icon(Icons.add),
+        //     label: const Text('Create Sample Data'),
+        //   ),
+        // ),
       ],
     );
   }

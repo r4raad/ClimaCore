@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../models/user.dart';
 import '../models/activity.dart';
+import '../models/quiz.dart'; // Added import for Quiz and QuizProgress
 import '../services/activity_service.dart';
+import '../services/quiz_service.dart'; // Added import for QuizService
 import 'settings_screen.dart';
 import 'edit_profile_screen.dart';
+import '../services/user_service.dart'; // Added import for UserService
+import '../constants.dart'; // Added import for AppConstants
 
 class ProfileScreen extends StatefulWidget {
   final AppUser user;
@@ -22,12 +26,22 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
   late TabController _tabController;
   List<Map<String, dynamic>> _userActions = [];
   bool _isLoading = true;
+  AppUser? _currentUser; // Add current user state
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    _currentUser = widget.user; // Initialize with passed user
+    _loadUserData(); // Load fresh user data
     _loadUserActions();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Refresh user data when screen becomes visible
+    _loadUserData();
   }
 
   @override
@@ -36,9 +50,24 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
     super.dispose();
   }
 
+  Future<void> _loadUserData() async {
+    try {
+      // Fetch fresh user data from Firestore
+      final userService = UserService();
+      final freshUser = await userService.getUserById(widget.user.id);
+      if (freshUser != null && mounted) {
+        setState(() {
+          _currentUser = freshUser;
+        });
+      }
+    } catch (e) {
+      print('❌ ProfileScreen: Error loading fresh user data: $e');
+    }
+  }
+
   Future<void> _loadUserActions() async {
     try {
-      setState(() => _isLoading = true);
+      if (mounted) setState(() => _isLoading = true);
       
       // Load user's recent activities and quiz submissions
       final results = await Future.wait([
@@ -77,21 +106,26 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
       // Sort by date (most recent first)
       allActions.sort((a, b) => (b['date'] as DateTime).compareTo(a['date'] as DateTime));
       
-      setState(() {
-        _userActions = allActions;
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _userActions = allActions;
+          _isLoading = false;
+        });
+      }
     } catch (e) {
       print('❌ ProfileScreen: Error loading user actions: $e');
-      setState(() => _isLoading = false);
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
   Future<List<Activity>> _loadUserActivities() async {
     try {
       if (widget.user.joinedSchoolId != null) {
+        // Fetch activities from the user's joined school
         final activities = await ActivityService().getActivities(widget.user.joinedSchoolId!);
-        // Filter activities where user participated (simplified for demo)
+        
+        // In a real implementation, you would also check which activities the user has participated in
+        // For now, we'll return recent activities from the school
         return activities.take(5).toList();
       }
       return [];
@@ -103,9 +137,37 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
 
   Future<List<Map<String, dynamic>>> _loadUserQuizSubmissions() async {
     try {
-      // For now, return empty list since we need to implement proper user progress tracking
-      // In a real app, you would fetch user's quiz progress from Firebase
-      return [];
+      // Fetch user's quiz progress from Firestore
+      final userProgress = await QuizService.getUserQuizProgress(widget.user.id);
+      
+      final quizSubmissions = <Map<String, dynamic>>[];
+      
+      for (final progress in userProgress) {
+        // Get quiz details for each progress entry
+        final quiz = await QuizService.getQuizById(progress.quizId);
+        if (quiz != null) {
+          final score = (progress.correctAnswers / progress.totalQuestions * 100).round();
+          int pointsEarned = 0;
+          
+          // Calculate points based on performance
+          if (score >= 90) {
+            pointsEarned = quiz.points;
+          } else if (score >= 70) {
+            pointsEarned = (quiz.points * 0.8).round();
+          } else if (score >= 50) {
+            pointsEarned = (quiz.points * 0.5).round();
+          }
+          
+          quizSubmissions.add({
+            'title': quiz.title,
+            'points': pointsEarned,
+            'date': progress.completedAt ?? DateTime.now(),
+            'score': score,
+          });
+        }
+      }
+      
+      return quizSubmissions;
     } catch (e) {
       print('❌ ProfileScreen: Error loading user quiz submissions: $e');
       return [];
@@ -145,39 +207,51 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
           ),
         ],
       ),
-      body: Column(
-        children: [
-          _buildUserInfo(),
-          const SizedBox(height: 20),
-          _buildTabBar(),
-          Expanded(
-            child: TabBarView(
-              controller: _tabController,
-              children: [
-                _buildActionsTab(),
-                _buildStatsTab(),
-              ],
+      body: RefreshIndicator(
+        onRefresh: () async {
+          await _loadUserData();
+          await _loadUserActions();
+        },
+        child: Column(
+          children: [
+            _buildUserInfo(),
+            const SizedBox(height: 20),
+            _buildTabBar(),
+            Expanded(
+              child: TabBarView(
+                controller: _tabController,
+                children: [
+                  _buildActionsTab(),
+                  _buildStatsTab(),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildUserInfo() {
+    final user = _currentUser ?? widget.user; // Use current user or fallback to widget user
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         children: [
           // Profile Picture
           GestureDetector(
-            onTap: () {
-              Navigator.push(
+            onTap: () async {
+              final result = await Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => EditProfileScreen(user: widget.user),
+                  builder: (context) => EditProfileScreen(user: user),
                 ),
               );
+              
+              // If profile was updated, refresh the user data
+              if (result == true) {
+                _loadUserData();
+              }
             },
             child: Stack(
               children: [
@@ -190,9 +264,9 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
                   ),
                   child: CircleAvatar(
                     radius: 38,
-                                  backgroundImage: widget.user.profilePic?.isNotEmpty == true
-                  ? NetworkImage(widget.user.profilePic!)
-                  : const AssetImage('assets/images/icon.png') as ImageProvider,
+                    backgroundImage: user.profilePic?.isNotEmpty == true
+                        ? NetworkImage(user.profilePic!)
+                        : const AssetImage(AppConstants.appLogoPath) as ImageProvider,
                   ),
                 ),
                 // Edit Icon
@@ -223,7 +297,7 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  widget.user.fullName,
+                  user.fullName,
                   style: GoogleFonts.questrial(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -234,14 +308,14 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
                 Row(
                   children: [
                     _buildStatItem(
-                      value: '${widget.user.points}',
+                      value: '${user.points}',
                       label: 'Green Points',
                       icon: Icons.emoji_events,
                       color: Colors.green,
                     ),
                     const SizedBox(width: 20),
                     _buildStatItem(
-                      value: '${widget.user.streak}',
+                      value: '${user.streak}',
                       label: 'Streak Days',
                       icon: Icons.local_fire_department,
                       color: Colors.red,
@@ -466,6 +540,7 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
   }
 
   Widget _buildStatsTab() {
+    final user = _currentUser ?? widget.user; // Use current user or fallback to widget user
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -489,7 +564,7 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
             child: Column(
               children: [
                 Text(
-                  '${widget.user.points}',
+                  '${user.points}',
                   style: GoogleFonts.questrial(
                     fontSize: 48,
                     fontWeight: FontWeight.bold,
@@ -578,7 +653,7 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
             ),
             child: FractionallySizedBox(
               alignment: Alignment.centerLeft,
-              widthFactor: 0.7, // 70% progress
+              widthFactor: user.weekGoal > 0 ? (user.weekPoints / user.weekGoal).clamp(0.0, 1.0) : 0.0,
               child: Container(
                 decoration: BoxDecoration(
                   color: Colors.green,
@@ -594,7 +669,7 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
             children: [
               Expanded(
                 child: _buildStatCard(
-                  value: '${widget.user.weekPoints}',
+                  value: '${user.weekPoints}',
                   label: 'Last 7 days',
                   color: Colors.green,
                 ),
@@ -602,7 +677,7 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
               const SizedBox(width: 12),
               Expanded(
                 child: _buildStatCard(
-                  value: '${widget.user.points}',
+                  value: '${user.points}',
                   label: 'All time',
                   color: Colors.blue,
                 ),
@@ -610,7 +685,7 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
               const SizedBox(width: 12),
               Expanded(
                 child: _buildStatCard(
-                  value: '${(widget.user.points / 100).round()}',
+                  value: '${(user.points / 100).round()}',
                   label: 'Average',
                   color: Colors.orange,
                 ),
@@ -623,10 +698,11 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
   }
 
   Widget _buildPointsGraph() {
-    // Simplified graph - in a real app, you'd use a chart library
+    // Use real user data for the graph
+    final user = _currentUser ?? widget.user;
     return CustomPaint(
       size: const Size(double.infinity, 200),
-      painter: PointsGraphPainter(),
+      painter: PointsGraphPainter(userPoints: user.points.toDouble(), weekPoints: user.weekPoints.toDouble()),
     );
   }
 
@@ -681,6 +757,11 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
 }
 
 class PointsGraphPainter extends CustomPainter {
+  final double userPoints;
+  final double weekPoints;
+
+  PointsGraphPainter({required this.userPoints, required this.weekPoints});
+
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
@@ -689,13 +770,16 @@ class PointsGraphPainter extends CustomPainter {
       ..strokeCap = StrokeCap.round;
 
     final path = Path();
+    
+    // Generate points based on user data
+    final maxPoints = userPoints > 0 ? userPoints : 100.0; // Fallback if no points
     final points = [
-      Offset(0, size.height * 0.8),
-      Offset(size.width * 0.2, size.height * 0.6),
-      Offset(size.width * 0.4, size.height * 0.3),
-      Offset(size.width * 0.6, size.height * 0.7),
-      Offset(size.width * 0.8, size.height * 0.2),
-      Offset(size.width, size.height * 0.4),
+      Offset(0, size.height * 0.8), // Start point
+      Offset(size.width * 0.2, size.height * (0.8 - (weekPoints / maxPoints) * 0.3)),
+      Offset(size.width * 0.4, size.height * (0.8 - (userPoints * 0.3 / maxPoints))),
+      Offset(size.width * 0.6, size.height * (0.8 - (userPoints * 0.5 / maxPoints))),
+      Offset(size.width * 0.8, size.height * (0.8 - (userPoints * 0.7 / maxPoints))),
+      Offset(size.width, size.height * (0.8 - (userPoints / maxPoints))),
     ];
 
     path.moveTo(points.first.dx, points.first.dy);

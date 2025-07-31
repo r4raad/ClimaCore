@@ -1,7 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/activity.dart';
+import '../services/user_service.dart';
 
 class ActivityService {
+  final UserService _userService = UserService();
+  
   CollectionReference getActivitiesCollection(String schoolId) {
     return FirebaseFirestore.instance.collection('schools').doc(schoolId).collection('activities');
   }
@@ -150,24 +153,66 @@ class ActivityService {
 
   Future<void> joinActivity(String schoolId, String activityId, String userId) async {
     try {
+      print('🎯 ActivityService: User $userId joining activity $activityId');
+      
+      // Get activity details to know the points
+      final activityDoc = await getActivitiesCollection(schoolId).doc(activityId).get();
+      if (!activityDoc.exists) {
+        throw Exception('Activity not found');
+      }
+      
+      final activityData = activityDoc.data() as Map<String, dynamic>;
+      final points = activityData['points'] ?? 0;
+      
+      print('💰 ActivityService: Activity offers $points points');
+      
+      // Update activity participants
       await getActivitiesCollection(schoolId).doc(activityId).update({
         'participants': FieldValue.arrayUnion([userId]),
         'participantCount': FieldValue.increment(1),
       });
+      
+      // Add points to user
+      await _userService.addUserPoints(userId, points);
+      await _userService.addWeekPoints(userId, points);
+      await _userService.addUserAction(userId);
+      
+      print('✅ ActivityService: User $userId successfully joined activity and earned $points points');
     } catch (e) {
-      print('Error joining activity: $e');
+      print('❌ ActivityService: Error joining activity: $e');
       rethrow;
     }
   }
 
   Future<void> leaveActivity(String schoolId, String activityId, String userId) async {
     try {
+      print('🚪 ActivityService: User $userId leaving activity $activityId');
+      
+      // Get activity details to know the points to deduct
+      final activityDoc = await getActivitiesCollection(schoolId).doc(activityId).get();
+      if (!activityDoc.exists) {
+        throw Exception('Activity not found');
+      }
+      
+      final activityData = activityDoc.data() as Map<String, dynamic>;
+      final points = activityData['points'] ?? 0;
+      
+      print('💰 ActivityService: Activity had $points points, deducting from user');
+      
+      // Update activity participants
       await getActivitiesCollection(schoolId).doc(activityId).update({
         'participants': FieldValue.arrayRemove([userId]),
         'participantCount': FieldValue.increment(-1),
       });
+      
+      // Deduct points from user (negative points to subtract)
+      await _userService.addUserPoints(userId, -points);
+      await _userService.addWeekPoints(userId, -points);
+      // Note: We don't decrement actions when leaving, as the action was already taken
+      
+      print('✅ ActivityService: User $userId successfully left activity and lost $points points');
     } catch (e) {
-      print('Error leaving activity: $e');
+      print('❌ ActivityService: Error leaving activity: $e');
       rethrow;
     }
   }

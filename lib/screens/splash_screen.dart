@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../constants.dart';
+import '../services/user_service.dart';
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -55,11 +56,27 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
 
   _checkCurrentUser() async {
     await Future.delayed(Duration(seconds: 3)); 
-    FirebaseAuth.instance.authStateChanges().listen((User? user) {
+    
+    if (!mounted) return; // Check if widget is still mounted
+    
+    FirebaseAuth.instance.authStateChanges().listen((User? user) async {
+      if (!mounted) return; // Check again before navigation
+      
       if (user == null) {
-        Navigator.pushReplacementNamed(context, '/auth');
+        if (mounted) {
+          Navigator.pushReplacementNamed(context, '/auth');
+        }
       } else {
-        Navigator.pushReplacementNamed(context, '/home');
+        // Create dummy users after authentication
+        try {
+          await UserService().ensureDummyUsersExist();
+        } catch (e) {
+          print('⚠️ Warning: Could not create dummy users: $e');
+        }
+        
+        if (mounted) {
+          Navigator.pushReplacementNamed(context, '/home');
+        }
       }
     });
   }

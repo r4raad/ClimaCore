@@ -3,6 +3,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../models/user.dart';
 import '../services/user_service.dart';
+import 'profile_picture_upload_screen.dart';
+import '../constants.dart';
 
 class EditProfileScreen extends StatefulWidget {
   final AppUser user;
@@ -95,41 +97,56 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   Widget _buildProfilePicture() {
     return Center(
-      child: Stack(
-        children: [
-          Container(
-            width: 120,
-            height: 120,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: Colors.green, width: 3),
+      child: GestureDetector(
+        onTap: () async {
+          final result = await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ProfilePictureUploadScreen(user: widget.user),
             ),
-            child: CircleAvatar(
-              radius: 58,
-              backgroundImage: widget.user.profilePic?.isNotEmpty == true
-                  ? NetworkImage(widget.user.profilePic!)
-                  : const AssetImage('assets/images/icon.png') as ImageProvider,
-            ),
-          ),
-          Positioned(
-            bottom: 0,
-            right: 0,
-            child: Container(
-              width: 32,
-              height: 32,
+          );
+          
+          // If profile picture was updated, refresh the user data
+          if (result == true) {
+            _loadUserData();
+          }
+        },
+        child: Stack(
+          children: [
+            Container(
+              width: 120,
+              height: 120,
               decoration: BoxDecoration(
-                color: Colors.green,
                 shape: BoxShape.circle,
-                border: Border.all(color: Colors.white, width: 3),
+                border: Border.all(color: Colors.green, width: 3),
               ),
-              child: const Icon(
-                Icons.edit,
-                color: Colors.white,
-                size: 16,
+              child: CircleAvatar(
+                radius: 58,
+                backgroundImage: widget.user.profilePic?.isNotEmpty == true
+                    ? NetworkImage(widget.user.profilePic!)
+                    : const AssetImage(AppConstants.appLogoPath) as ImageProvider,
               ),
             ),
-          ),
-        ],
+            Positioned(
+              bottom: 0,
+              right: 0,
+              child: Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: Colors.green,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.white, width: 3),
+                ),
+                child: const Icon(
+                  Icons.camera_alt,
+                  color: Colors.white,
+                  size: 16,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -306,7 +323,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       },
     );
 
-    if (picked != null && picked != _selectedDate) {
+    if (picked != null && picked != _selectedDate && mounted) {
       setState(() {
         _selectedDate = picked;
         _dateOfBirthController.text = _formatDate(picked);
@@ -320,7 +337,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     }
 
     try {
-      setState(() => _isLoading = true);
+      if (mounted) setState(() => _isLoading = true);
 
       // Update user data in Firestore
       await UserService().usersCollection.doc(widget.user.id).update({
@@ -342,7 +359,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         ),
       );
 
-      Navigator.pop(context);
+      Navigator.pop(context, true); // Return true to indicate profile was updated
     } catch (e) {
       print('❌ EditProfileScreen: Error saving changes: $e');
       ScaffoldMessenger.of(context).showSnackBar(
@@ -352,7 +369,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         ),
       );
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 

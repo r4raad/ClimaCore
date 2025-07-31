@@ -10,6 +10,7 @@ import '../services/quiz_service.dart';
 import 'profile_screen.dart';
 import 'ai_chat_screen.dart';
 import 'quiz_detail_screen.dart';
+import '../constants.dart';
 
 class HomeScreen extends StatefulWidget {
   final AppUser user;
@@ -36,7 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _loadData() async {
     try {
-      setState(() => _isLoading = true);
+      if (mounted) setState(() => _isLoading = true);
       
       // Load latest activity and quiz
       final results = await Future.wait([
@@ -44,14 +45,16 @@ class _HomeScreenState extends State<HomeScreen> {
         _loadLatestQuiz(),
       ]);
       
+      if (mounted) {
       setState(() {
         _latestActivity = results[0] as Activity?;
         _latestQuiz = results[1] as Quiz?;
         _isLoading = false;
       });
+      }
     } catch (e) {
       print('❌ HomeScreen: Error loading data: $e');
-      setState(() => _isLoading = false);
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -130,9 +133,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 child: CircleAvatar(
                   radius: 28,
-                                backgroundImage: widget.user.profilePic?.isNotEmpty == true
-                  ? NetworkImage(widget.user.profilePic!)
-                  : const AssetImage('assets/images/icon.png') as ImageProvider,
+                  backgroundImage: widget.user.profilePic?.isNotEmpty == true
+                      ? NetworkImage(widget.user.profilePic!)
+                      : const AssetImage(AppConstants.appLogoPath) as ImageProvider,
                 ),
               ),
               // Notification Badge

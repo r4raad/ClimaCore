@@ -2,11 +2,12 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 import '../models/disaster_event.dart';
+import '../utils/env_config.dart';
 
 class NewsService {
-  // API keys for real-time news
-  static const String _newsApiKey = '9e2a2889e5434c26a27b8575ef476643'; // Get from https://newsapi.org/
-  static const String _gNewsApiKey = '9325b82ee95c436591389f541e45d3e4'; // Get from https://gnews.io/
+  // API keys for real-time news - now using hardcoded values from EnvConfig
+  static String get _newsApiKey => EnvConfig.newsApiKey;
+  static String get _gNewsApiKey => EnvConfig.gNewsApiKey;
   
   static const String _newsApiBaseUrl = 'https://newsapi.org/v2';
   static const String _gNewsBaseUrl = 'https://gnews.io/api/v4';

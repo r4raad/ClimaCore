@@ -60,11 +60,6 @@ class _ActivityDetailScreenState extends State<ActivityDetailScreen> {
       } else {
         await _activityService.joinActivity(widget.schoolId, widget.activity.id, widget.currentUser.id);
         
-        // Award points and update user stats
-        await _userService.addUserPoints(widget.currentUser.id, widget.activity.points);
-        await _userService.addUserAction(widget.currentUser.id);
-        await _userService.addWeekPoints(widget.currentUser.id, widget.activity.points);
-        
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('You joined the activity! +${widget.activity.points} points earned!'),

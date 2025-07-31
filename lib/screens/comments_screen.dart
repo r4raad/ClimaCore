@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../models/comment.dart';
 import '../models/post.dart';
 import '../models/user.dart';
-import '../models/comment.dart';
 import '../services/post_service.dart';
+import '../constants.dart';
 import 'package:uuid/uuid.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -121,7 +123,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
                   children: [
                     CircleAvatar(
                       radius: 16,
-                      backgroundImage: AssetImage('assets/images/icon.png'),
+                      backgroundImage: const AssetImage(AppConstants.appLogoPath),
                     ),
                     SizedBox(width: 8),
                     Text(
@@ -238,7 +240,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
             children: [
               CircleAvatar(
                 radius: 16,
-                backgroundImage: AssetImage('assets/images/icon.png'),
+                backgroundImage: const AssetImage(AppConstants.appLogoPath),
               ),
               SizedBox(width: 8),
               Expanded(

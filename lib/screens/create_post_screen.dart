@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../models/post.dart';
-import '../services/post_service.dart';
 import '../models/user.dart';
+import '../services/post_service.dart';
+import '../services/image_upload_service.dart';
+import '../constants.dart';
 import 'package:uuid/uuid.dart';
+import 'dart:io';
+import 'dart:typed_data';
 
 class CreatePostScreen extends StatefulWidget {
   final String schoolId;
@@ -16,14 +21,54 @@ class CreatePostScreen extends StatefulWidget {
 class _CreatePostScreenState extends State<CreatePostScreen> {
   final _formKey = GlobalKey<FormState>();
   final _contentController = TextEditingController();
-  final _imageUrlController = TextEditingController();
   bool _loading = false;
+  File? _selectedImageFile;
+  Uint8List? _selectedImageBytes;
+  bool _hasImage = false;
 
   @override
   void dispose() {
     _contentController.dispose();
-    _imageUrlController.dispose();
     super.dispose();
+  }
+
+  Future<void> _pickImageFromGallery() async {
+    try {
+      final imageFile = await ImageUploadService.pickImageFromGallery();
+      if (imageFile != null) {
+        setState(() {
+          _selectedImageFile = imageFile;
+          _selectedImageBytes = null;
+          _hasImage = true;
+        });
+      }
+    } catch (e) {
+      _showErrorSnackBar('Failed to pick image: $e');
+    }
+  }
+
+  Future<void> _takePhotoWithCamera() async {
+    try {
+      final imageBytes = await ImageUploadService.takePhotoWithCamera();
+      if (imageBytes != null) {
+        setState(() {
+          _selectedImageBytes = imageBytes;
+          _selectedImageFile = null;
+          _hasImage = true;
+        });
+      }
+    } catch (e) {
+      _showErrorSnackBar('Failed to take photo: $e');
+    }
+  }
+
+  void _showErrorSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+      ),
+    );
   }
 
   void _submit() async {
@@ -36,11 +81,31 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
       print('📝 CreatePost: User ID: ${widget.user.id}');
       print('📝 CreatePost: Content: ${_contentController.text.trim()}');
       
+      final postId = Uuid().v4();
+      String? imageUrl;
+      
+      // Upload image if selected
+      if (_hasImage) {
+        print('📝 CreatePost: Uploading image to Supabase...');
+        if (_selectedImageFile != null) {
+          imageUrl = await ImageUploadService.uploadPostImage(
+            postId: postId,
+            imageFile: _selectedImageFile,
+          );
+        } else if (_selectedImageBytes != null) {
+          imageUrl = await ImageUploadService.uploadPostImage(
+            postId: postId,
+            imageBytes: _selectedImageBytes,
+          );
+        }
+        print('📝 CreatePost: Image uploaded: $imageUrl');
+      }
+      
       final post = Post(
-        id: Uuid().v4(),
+        id: postId,
         userId: widget.user.id,
         content: _contentController.text.trim(),
-        imageUrl: _imageUrlController.text.trim().isEmpty ? null : _imageUrlController.text.trim(),
+        imageUrl: imageUrl,
         timestamp: DateTime.now(),
         likes: [],
         saves: [],
@@ -114,7 +179,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                   CircleAvatar(
                     backgroundImage: widget.user.profilePic != null 
                         ? NetworkImage(widget.user.profilePic!)
-                        : AssetImage('assets/images/icon.png') as ImageProvider,
+                        : const AssetImage(AppConstants.appLogoPath) as ImageProvider,
                     radius: 20,
                   ),
                   SizedBox(width: 12),
@@ -144,23 +209,75 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                 },
               ),
               SizedBox(height: 16),
-              TextFormField(
-                controller: _imageUrlController,
-                decoration: InputDecoration(
-                  labelText: 'Image URL (optional)',
-                  hintText: 'https://example.com/image.jpg',
-                  border: OutlineInputBorder(),
+              
+              // Image Selection Status
+              if (_hasImage)
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.green[50],
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.green[200]!),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.check_circle,
+                        color: Colors.green[600],
+                        size: 20,
+                      ),
+                      SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'Image selected',
+                          style: TextStyle(
+                            color: Colors.green[700],
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          setState(() {
+                            _selectedImageFile = null;
+                            _selectedImageBytes = null;
+                            _hasImage = false;
+                          });
+                        },
+                        icon: Icon(Icons.clear, color: Colors.green[600], size: 20),
+                        padding: EdgeInsets.zero,
+                        constraints: BoxConstraints(),
+                      ),
+                    ],
+                  ),
                 ),
-                validator: (v) {
-                  if (v != null && v.isNotEmpty) {
-                    final uri = Uri.tryParse(v);
-                    if (uri == null || !uri.hasAbsolutePath) {
-                      return 'Please enter a valid URL';
-                    }
-                  }
-                  return null;
-                },
+              
+              SizedBox(height: 16),
+              
+              // Image Upload Options
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildImageUploadOption(
+                      icon: Icons.photo_library,
+                      title: 'Gallery',
+                      onTap: _pickImageFromGallery,
+                      color: Colors.blue,
+                    ),
+                  ),
+                  SizedBox(width: 12),
+                  Expanded(
+                    child: _buildImageUploadOption(
+                      icon: Icons.camera_alt,
+                      title: 'Camera',
+                      onTap: _takePhotoWithCamera,
+                      color: Colors.green,
+                    ),
+                  ),
+                ],
               ),
+              
               SizedBox(height: 24),
               if (_loading)
                 Center(
@@ -174,6 +291,43 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                 ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildImageUploadOption({
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+    required Color color,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: color.withOpacity(0.3)),
+        ),
+        child: Column(
+          children: [
+            Icon(
+              icon,
+              color: color,
+              size: 24,
+            ),
+            SizedBox(height: 4),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: Colors.grey[700],
+              ),
+            ),
+          ],
         ),
       ),
     );

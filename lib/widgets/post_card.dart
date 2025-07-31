@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/post.dart';
 import '../models/user.dart';
 import '../services/post_service.dart';
+import '../constants.dart';
 
 class PostCard extends StatelessWidget {
   final PostWithUser postWithUser;
@@ -44,7 +45,7 @@ class PostCard extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 20,
-                  backgroundImage: AssetImage('assets/images/icon.png'),
+                  backgroundImage: AssetImage(AppConstants.appLogoPath),
                 ),
                 SizedBox(width: 12),
                 Expanded(

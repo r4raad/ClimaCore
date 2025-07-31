@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../services/user_service.dart';
 import '../models/user.dart';
+import '../screens/profile_picture_upload_screen.dart'; // Fixed import path
 
 class EmailAuthForm extends StatefulWidget {
   final Function(String) showSuccessDialog;
@@ -69,6 +70,7 @@ class _EmailAuthFormState extends State<EmailAuthForm> with TickerProviderStateM
           if (firebaseUser != null) {
             AppUser? appUser = await userService.getUserById(firebaseUser.uid);
             if (appUser == null) {
+              // Only for new users, set default values in Firestore
               await userService.addUser(AppUser(
                 id: firebaseUser.uid,
                 firstName: firebaseUser.displayName?.split(' ').first ?? '',
@@ -83,6 +85,7 @@ class _EmailAuthFormState extends State<EmailAuthForm> with TickerProviderStateM
                 weekGoal: 800,
               ));
             }
+            // Always use appUser from Firestore for display and logic
           }
           widget.showSuccessDialog('''Welcome Back to ClimaCore!\nYour all-in-one space to learn, act, and lead the way in climate action.''');
         } else {
@@ -90,7 +93,7 @@ class _EmailAuthFormState extends State<EmailAuthForm> with TickerProviderStateM
           final userService = UserService();
           final firebaseUser = userCredential.user;
           if (firebaseUser != null) {
-            await userService.addUser(AppUser(
+            final newUser = AppUser(
               id: firebaseUser.uid,
               firstName: _firstName,
               lastName: _lastName,
@@ -102,9 +105,21 @@ class _EmailAuthFormState extends State<EmailAuthForm> with TickerProviderStateM
               streak: 0,
               weekPoints: 0,
               weekGoal: 800,
-            ));
+            );
+            await userService.addUser(newUser);
+            // Navigate to profile picture upload screen
+            if (mounted) {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ProfilePictureUploadScreen(
+                    user: newUser,
+                    isFromRegistration: true,
+                  ),
+                ),
+              );
+            }
           }
-          widget.showSuccessDialog('''Welcome to ClimaCore!\nYour all-in-one space to learn, act, and lead the way in climate action.''');
         }
       } on FirebaseAuthException catch (e) {
         String errorMessage;
