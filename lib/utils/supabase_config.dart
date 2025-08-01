@@ -10,10 +10,16 @@ class SupabaseConfig {
   static String get supabaseAnonKey => EnvConfig.supabaseAnonKey;
   
   static Future<void> initialize() async {
-    await Supabase.initialize(
-      url: supabaseUrl,
-      anonKey: supabaseAnonKey,
-    );
+    try {
+      await Supabase.initialize(
+        url: supabaseUrl,
+        anonKey: supabaseAnonKey,
+      );
+      print('✅ Supabase initialized successfully');
+    } catch (e) {
+      print('❌ Error initializing Supabase: $e');
+      rethrow;
+    }
   }
   
   static SupabaseClient get client => Supabase.instance.client;
@@ -36,29 +42,32 @@ class SupabaseImageService {
       final fileName = customFileName ?? '${Uuid().v4()}.jpg';
       final filePath = '$folder/$fileName';
       
-      // Upload to Supabase Storage with better error handling
-      try {
-        await SupabaseConfig.client.storage
-            .from(bucketName)
-            .upload(filePath, compressedImage);
-      } catch (e) {
-        // If bucket doesn't exist, try to create it
-        if (e.toString().contains('bucket') || e.toString().contains('not found')) {
-          print('⚠️ Storage bucket not found, attempting to create...');
-          // Note: Bucket creation requires admin privileges
-          // For now, we'll use a fallback approach
-          throw Exception('Storage bucket not configured. Please set up Supabase storage bucket: $bucketName');
-        }
-        rethrow;
-      }
+      print('📤 Uploading image to Supabase: $filePath');
+      
+      // Upload to Supabase Storage
+      await SupabaseConfig.client.storage
+          .from(bucketName)
+          .upload(filePath, compressedImage);
       
       // Get public URL
       final imageUrl = SupabaseConfig.client.storage
           .from(bucketName)
           .getPublicUrl(filePath);
       
+      print('✅ Image uploaded successfully: $imageUrl');
       return imageUrl;
     } catch (e) {
+      print('❌ Supabase upload error: $e');
+      
+      // Check if bucket exists
+      try {
+        await SupabaseConfig.client.storage.listBuckets();
+        print('✅ Buckets accessible');
+      } catch (bucketError) {
+        print('❌ Cannot access buckets: $bucketError');
+        throw Exception('Supabase storage not accessible. Please check your Supabase project settings.');
+      }
+      
       throw Exception('Failed to upload image: $e');
     }
   }
@@ -77,29 +86,22 @@ class SupabaseImageService {
       final fileName = customFileName ?? '${Uuid().v4()}.jpg';
       final filePath = '$folder/$fileName';
       
-      // Upload to Supabase Storage with better error handling
-      try {
-        await SupabaseConfig.client.storage
-            .from(bucketName)
-            .uploadBinary(filePath, compressedBytes);
-      } catch (e) {
-        // If bucket doesn't exist, try to create it
-        if (e.toString().contains('bucket') || e.toString().contains('not found')) {
-          print('⚠️ Storage bucket not found, attempting to create...');
-          // Note: Bucket creation requires admin privileges
-          // For now, we'll use a fallback approach
-          throw Exception('Storage bucket not configured. Please set up Supabase storage bucket: $bucketName');
-        }
-        rethrow;
-      }
+      print('📤 Uploading image bytes to Supabase: $filePath');
+      
+      // Upload to Supabase Storage
+      await SupabaseConfig.client.storage
+          .from(bucketName)
+          .uploadBinary(filePath, compressedBytes);
       
       // Get public URL
       final imageUrl = SupabaseConfig.client.storage
           .from(bucketName)
           .getPublicUrl(filePath);
       
+      print('✅ Image bytes uploaded successfully: $imageUrl');
       return imageUrl;
     } catch (e) {
+      print('❌ Supabase upload error: $e');
       throw Exception('Failed to upload image: $e');
     }
   }
@@ -116,7 +118,7 @@ class SupabaseImageService {
           .from(bucketName)
           .remove([filePath]);
     } catch (e) {
-      print('Warning: Failed to delete image: $e');
+      print('⚠️ Warning: Failed to delete image: $e');
     }
   }
   
@@ -139,7 +141,7 @@ class SupabaseImageService {
     final image = img.decodeImage(imageBytes);
     if (image == null) throw Exception('Failed to decode image');
     
-    // Resize image to max dimensions (1200x1200 for profile pics, 1600x1600 for posts)
+    // Resize image to max dimensions
     final maxWidth = 1600;
     final maxHeight = 1600;
     

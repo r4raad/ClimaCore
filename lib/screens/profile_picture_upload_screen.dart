@@ -98,30 +98,56 @@ class _ProfilePictureUploadScreenState extends State<ProfilePictureUploadScreen>
 
   Future<void> _pickImageFromGallery() async {
     try {
+      setState(() {
+        _isLoading = true;
+      });
+
       final imageFile = await ImageUploadService.pickImageFromGallery();
       if (imageFile != null) {
         setState(() {
           _selectedImageFile = imageFile;
           _selectedImageBytes = null;
           _isImageValid = true;
+          _isLoading = false;
+        });
+        _showSuccessMessage('Image selected successfully');
+      } else {
+        setState(() {
+          _isLoading = false;
         });
       }
     } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
       _showErrorSnackBar('Failed to pick image: $e');
     }
   }
 
   Future<void> _takePhotoWithCamera() async {
     try {
+      setState(() {
+        _isLoading = true;
+      });
+
       final imageBytes = await ImageUploadService.takePhotoWithCamera();
       if (imageBytes != null) {
         setState(() {
           _selectedImageBytes = imageBytes;
           _selectedImageFile = null;
           _isImageValid = true;
+          _isLoading = false;
+        });
+        _showSuccessMessage('Photo captured successfully');
+      } else {
+        setState(() {
+          _isLoading = false;
         });
       }
     } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
       _showErrorSnackBar('Failed to take photo: $e');
     }
   }
@@ -132,17 +158,21 @@ class _ProfilePictureUploadScreenState extends State<ProfilePictureUploadScreen>
       return;
     }
 
-    setState(() => _isLoading = true);
+    setState(() {
+      _isLoading = true;
+    });
 
     try {
       String? imageUrl;
       
       if (_selectedImageFile != null) {
+        print('📤 Uploading profile picture from file...');
         imageUrl = await ImageUploadService.uploadProfilePicture(
           userId: widget.user.id,
           imageFile: _selectedImageFile,
         );
       } else if (_selectedImageBytes != null) {
+        print('📤 Uploading profile picture from bytes...');
         imageUrl = await ImageUploadService.uploadProfilePicture(
           userId: widget.user.id,
           imageBytes: _selectedImageBytes,
@@ -150,17 +180,14 @@ class _ProfilePictureUploadScreenState extends State<ProfilePictureUploadScreen>
       }
 
       if (imageUrl != null) {
+        print('✅ Profile picture uploaded successfully: $imageUrl');
+        
         final userService = UserService();
         await userService.updateUserProfilePic(widget.user.id, imageUrl);
         
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Profile picture updated successfully!'),
-              backgroundColor: Colors.green,
-            ),
-          );
-
+          _showSuccessMessage('Profile picture updated successfully!');
+          
           if (widget.isFromRegistration) {
             // Navigate to home screen after registration
             Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
@@ -170,9 +197,10 @@ class _ProfilePictureUploadScreenState extends State<ProfilePictureUploadScreen>
           }
         }
       } else {
-        _showErrorSnackBar('Failed to upload image');
+        throw Exception('Failed to upload image - no URL returned');
       }
     } catch (e) {
+      print('❌ Error uploading profile picture: $e');
       _showErrorSnackBar('Failed to update profile picture: $e');
     } finally {
       if (mounted) {
@@ -187,6 +215,19 @@ class _ProfilePictureUploadScreenState extends State<ProfilePictureUploadScreen>
         SnackBar(
           content: Text(message),
           backgroundColor: Colors.red,
+          duration: const Duration(seconds: 4),
+        ),
+      );
+    }
+  }
+
+  void _showSuccessMessage(String message) {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+          backgroundColor: Colors.green,
+          duration: const Duration(seconds: 2),
         ),
       );
     }
@@ -204,37 +245,42 @@ class _ProfilePictureUploadScreenState extends State<ProfilePictureUploadScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[50],
-      body: SafeArea(
-        child: FadeTransition(
-          opacity: _fadeAnimation,
-          child: Column(
-            children: [
-              // Header
-              _buildHeader(),
-              
-              Expanded(
-                child: SlideTransition(
-                  position: _slideAnimation,
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(24),
-                    child: Column(
-                      children: [
-                        // Profile Picture Preview
-                        _buildProfilePreview(),
-                        const SizedBox(height: 32),
-                        
-                        // Upload Form
-                        _buildUploadForm(),
-                        const SizedBox(height: 32),
-                        
-                        // Action Buttons
-                        _buildActionButtons(),
-                      ],
-                    ),
-                  ),
-                ),
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Text(
+          'Profile Picture',
+          style: GoogleFonts.questrial(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
+        ),
+      ),
+      body: FadeTransition(
+        opacity: _fadeAnimation,
+        child: SlideTransition(
+          position: _slideAnimation,
+          child: ScaleTransition(
+            scale: _scaleAnimation,
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                children: [
+                  _buildHeader(),
+                  const SizedBox(height: 30),
+                  _buildImagePreview(),
+                  const SizedBox(height: 30),
+                  _buildUploadOptions(),
+                  const SizedBox(height: 30),
+                  _buildActionButtons(),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),
@@ -242,296 +288,121 @@ class _ProfilePictureUploadScreenState extends State<ProfilePictureUploadScreen>
   }
 
   Widget _buildHeader() {
-    return Container(
-      padding: const EdgeInsets.all(24),
-      child: Row(
-        children: [
-          if (!widget.isFromRegistration)
-            IconButton(
-              onPressed: () => Navigator.pop(context),
-              icon: Icon(Icons.arrow_back, color: Colors.grey[700]),
-            ),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  widget.isFromRegistration 
-                      ? 'Welcome to ClimaCore!'
-                      : 'Update Profile Picture',
-                  style: GoogleFonts.questrial(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.grey[800],
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  widget.isFromRegistration
-                      ? 'Let\'s personalize your profile'
-                      : 'Choose a profile picture that represents you',
-                  style: GoogleFonts.questrial(
-                    fontSize: 16,
-                    color: Colors.grey[600],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildProfilePreview() {
-    return ScaleTransition(
-      scale: _scaleAnimation,
-      child: Container(
-        width: 150,
-        height: 150,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 20,
-              offset: const Offset(0, 10),
-            ),
-          ],
-        ),
-        child: Stack(
-          children: [
-            // Profile Picture
-            Container(
-              width: 150,
-              height: 150,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.green, width: 4),
-              ),
-              child: ClipOval(
-                child: _previewImageUrl != null
-                    ? Image.network(
-                        _previewImageUrl!,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return _buildDefaultAvatar();
-                        },
-                        loadingBuilder: (context, child, loadingProgress) {
-                          if (loadingProgress == null) return child;
-                          return _buildDefaultAvatar();
-                        },
-                      )
-                    : _buildDefaultAvatar(),
-              ),
-            ),
-            
-            // Upload Icon Overlay
-            if (_previewImageUrl == null)
-              Positioned(
-                bottom: 0,
-                right: 0,
-                child: Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: Colors.green,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 3),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: const Icon(
-                    Icons.camera_alt,
-                    color: Colors.white,
-                    size: 20,
-                  ),
-                ),
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDefaultAvatar() {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Colors.green[300]!, Colors.green[600]!],
-        ),
-      ),
-      child: Icon(
-        Icons.person,
-        size: 60,
-        color: Colors.white,
-      ),
-    );
-  }
-
-  Widget _buildUploadForm() {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Upload Profile Picture',
+          'Add a Profile Picture',
           style: GoogleFonts.questrial(
-            fontSize: 18,
+            fontSize: 24,
             fontWeight: FontWeight.bold,
             color: Colors.grey[800],
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 10),
         Text(
           'Choose a photo from your gallery or take a new one',
           style: GoogleFonts.questrial(
-            fontSize: 14,
+            fontSize: 16,
             color: Colors.grey[600],
           ),
-        ),
-        const SizedBox(height: 24),
-        
-        // Image Selection Status
-        if (_selectedImageFile != null || _selectedImageBytes != null)
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.green[50],
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.green[200]!),
-            ),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.check_circle,
-                  color: Colors.green[600],
-                  size: 24,
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Image Selected',
-                        style: GoogleFonts.questrial(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.green[700],
-                        ),
-                      ),
-                      Text(
-                        _selectedImageFile != null 
-                            ? 'File: ${_selectedImageFile!.path.split('/').last}'
-                            : 'Camera photo selected',
-                        style: GoogleFonts.questrial(
-                          fontSize: 12,
-                          color: Colors.green[600],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                IconButton(
-                  onPressed: () {
-                    setState(() {
-                      _selectedImageFile = null;
-                      _selectedImageBytes = null;
-                      _isImageValid = false;
-                    });
-                  },
-                  icon: Icon(Icons.clear, color: Colors.green[600]),
-                ),
-              ],
-            ),
-          ),
-        
-        const SizedBox(height: 16),
-        
-        // Upload Options
-        Row(
-          children: [
-            Expanded(
-              child: _buildUploadOption(
-                icon: Icons.photo_library,
-                title: 'Gallery',
-                subtitle: 'Choose from photos',
-                onTap: _pickImageFromGallery,
-                color: Colors.blue,
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: _buildUploadOption(
-                icon: Icons.camera_alt,
-                title: 'Camera',
-                subtitle: 'Take a photo',
-                onTap: _takePhotoWithCamera,
-                color: Colors.green,
-              ),
-            ),
-          ],
+          textAlign: TextAlign.center,
         ),
       ],
     );
   }
 
-  Widget _buildUploadOption({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required VoidCallback onTap,
-    required Color color,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
+  Widget _buildImagePreview() {
+    return Center(
       child: Container(
-        padding: const EdgeInsets.all(16),
+        width: 150,
+        height: 150,
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: color.withOpacity(0.3)),
+          shape: BoxShape.circle,
+          border: Border.all(color: Colors.green, width: 3),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withOpacity(0.1),
               blurRadius: 10,
-              offset: const Offset(0, 2),
+              offset: const Offset(0, 5),
             ),
           ],
         ),
-        child: Column(
-          children: [
-            Icon(
-              icon,
-              color: color,
-              size: 32,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              title,
-              style: GoogleFonts.questrial(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.grey[800],
-              ),
-            ),
-            Text(
-              subtitle,
-              style: GoogleFonts.questrial(
-                fontSize: 12,
-                color: Colors.grey[600],
-              ),
-            ),
-          ],
+        child: ClipOval(
+          child: _isImageValid
+              ? _selectedImageFile != null
+                  ? Image.file(
+                      _selectedImageFile!,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return _buildPlaceholderImage();
+                      },
+                    )
+                  : _selectedImageBytes != null
+                      ? Image.memory(
+                          _selectedImageBytes!,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return _buildPlaceholderImage();
+                          },
+                        )
+                      : _buildPlaceholderImage()
+              : _buildPlaceholderImage(),
         ),
+      ),
+    );
+  }
+
+  Widget _buildPlaceholderImage() {
+    return Container(
+      color: Colors.grey[200],
+      child: Icon(
+        Icons.person,
+        size: 60,
+        color: Colors.grey[400],
+      ),
+    );
+  }
+
+  Widget _buildUploadOptions() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        Expanded(
+          child: _buildUploadButton(
+            icon: Icons.photo_library,
+            label: 'Gallery',
+            onPressed: _isLoading ? null : _pickImageFromGallery,
+          ),
+        ),
+        const SizedBox(width: 20),
+        Expanded(
+          child: _buildUploadButton(
+            icon: Icons.camera_alt,
+            label: 'Camera',
+            onPressed: _isLoading ? null : _takePhotoWithCamera,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildUploadButton({
+    required IconData icon,
+    required String label,
+    required VoidCallback? onPressed,
+  }) {
+    return ElevatedButton.icon(
+      onPressed: onPressed,
+      icon: Icon(icon),
+      label: Text(label),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.green,
+        foregroundColor: Colors.white,
+        padding: const EdgeInsets.symmetric(vertical: 15),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        elevation: 2,
       ),
     );
   }
@@ -539,41 +410,39 @@ class _ProfilePictureUploadScreenState extends State<ProfilePictureUploadScreen>
   Widget _buildActionButtons() {
     return Column(
       children: [
-        // Save Button
         SizedBox(
           width: double.infinity,
-          height: 56,
           child: ElevatedButton(
-            onPressed: _isImageValid && !_isLoading ? _saveProfilePicture : null,
+            onPressed: _isLoading || !_isImageValid ? null : _saveProfilePicture,
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.green,
               foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(vertical: 16),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(12),
               ),
               elevation: 0,
             ),
             child: _isLoading
-                ? SizedBox(
-                    width: 24,
-                    height: 24,
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
                     child: CircularProgressIndicator(
-                      color: Colors.white,
                       strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                     ),
                   )
                 : Text(
-                    widget.isFromRegistration ? 'Continue' : 'Save Changes',
+                    'Save Profile Picture',
                     style: GoogleFonts.questrial(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
           ),
         ),
-        
-        if (widget.isFromRegistration) ...[
-          const SizedBox(height: 16),
+        if (!widget.isFromRegistration) ...[
+          const SizedBox(height: 15),
           TextButton(
             onPressed: _isLoading ? null : _skipForNow,
             child: Text(

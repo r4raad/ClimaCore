@@ -5,6 +5,7 @@ import 'package:geolocator/geolocator.dart';
 import '../models/ecore.dart';
 import '../models/user.dart';
 import '../services/climagame_service.dart';
+import '../utils/env_config.dart';
 import 'mission_detail_screen.dart';
 
 class ClimaGameScreen extends StatefulWidget {
@@ -24,8 +25,10 @@ class _ClimaGameScreenState extends State<ClimaGameScreen> with TickerProviderSt
   
   List<Ecore> _ecores = [];
   List<Map<String, dynamic>> _schoolRankings = [];
+  Map<String, dynamic> _gameStats = {};
   bool _isLoading = true;
   bool _hasError = false;
+  bool _mapInitialized = false;
   
   GoogleMapController? _mapController;
   Position? _currentPosition;
@@ -48,17 +51,43 @@ class _ClimaGameScreenState extends State<ClimaGameScreen> with TickerProviderSt
       duration: const Duration(seconds: 2),
       vsync: this,
     );
-    // _pulseAnimation = Tween<double>( // Removed unused field
-    //   begin: 0.8,
-    //   end: 1.2,
-    // ).animate(CurvedAnimation(
-    //   parent: _pulseController,
-    //   curve: Curves.easeInOut,
-    // ));
     
-    // _pulseController.repeat(reverse: true); // Removed unused field
+    _initializeMap();
     _loadData();
     _getCurrentLocation();
+    
+    // Initialize comprehensive game if no data exists
+    _initializeGameIfNeeded();
+  }
+
+  Future<void> _initializeMap() async {
+    try {
+      // Initialize Google Maps for web
+      if (!EnvConfig.isGoogleMapsConfigured) {
+        print('❌ Google Maps API key not configured');
+        setState(() {
+          _hasError = true;
+        });
+        return;
+      }
+
+      // Set up initial camera position
+      final initialPosition = const LatLng(37.7749, -122.4194); // Default to San Francisco
+      
+      // Add a small delay to ensure Google Maps API is loaded
+      await Future.delayed(const Duration(milliseconds: 500));
+      
+      setState(() {
+        _mapInitialized = true;
+      });
+      
+      print('✅ Google Maps initialized successfully');
+    } catch (e) {
+      print('❌ Error initializing Google Maps: $e');
+      setState(() {
+        _hasError = true;
+      });
+    }
   }
 
   @override
@@ -79,12 +108,14 @@ class _ClimaGameScreenState extends State<ClimaGameScreen> with TickerProviderSt
       final results = await Future.wait([
         ClimaGameService.getEcores(),
         ClimaGameService.getSchoolRankings(),
+        ClimaGameService.getGameStats(),
       ]);
 
       if (mounted) {
         setState(() {
           _ecores = results[0] as List<Ecore>;
           _schoolRankings = results[1] as List<Map<String, dynamic>>;
+          _gameStats = results[2] as Map<String, dynamic>;
           _isLoading = false;
         });
       }
@@ -96,6 +127,21 @@ class _ClimaGameScreenState extends State<ClimaGameScreen> with TickerProviderSt
         _isLoading = false;
         _hasError = true;
       });
+    }
+  }
+
+  Future<void> _initializeGameIfNeeded() async {
+    try {
+      // Check if game data exists
+      final ecores = await ClimaGameService.getEcores();
+      if (ecores.isEmpty) {
+        print('🎮 No game data found, initializing comprehensive game...');
+        await ClimaGameService.createComprehensiveSampleGame();
+        // Reload data after initialization
+        _loadData();
+      }
+    } catch (e) {
+      print('❌ Error initializing game: $e');
     }
   }
 
@@ -428,13 +474,41 @@ class _ClimaGameScreenState extends State<ClimaGameScreen> with TickerProviderSt
               ),
               child: Column(
                 children: [
-                  Text(
-                    'ClimaGame',
-                    style: GoogleFonts.questrial(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.grey[800],
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'ClimaGame',
+                        style: GoogleFonts.questrial(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.grey[800],
+                        ),
+                      ),
+                      if (_gameStats.isNotEmpty)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(15),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.1),
+                                blurRadius: 4,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Text(
+                            '${_gameStats['currentSeason'] ?? 'Spring'} Season',
+                            style: GoogleFonts.questrial(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.green[700],
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
                   const SizedBox(height: 16),
                   Container(
@@ -465,6 +539,17 @@ class _ClimaGameScreenState extends State<ClimaGameScreen> with TickerProviderSt
                       ],
                     ),
                   ),
+                  if (_gameStats.isNotEmpty) ...[
+                    const SizedBox(height: 12),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        _buildStatItem('Ecores', '${_gameStats['totalEcores'] ?? 0}'),
+                        _buildStatItem('Missions', '${_gameStats['completedMissions'] ?? 0}/${_gameStats['totalMissions'] ?? 0}'),
+                        _buildStatItem('Schools', '${_gameStats['activeSchools'] ?? 0}'),
+                      ],
+                    ),
+                  ],
                 ],
               ),
             ),
@@ -494,7 +579,7 @@ class _ClimaGameScreenState extends State<ClimaGameScreen> with TickerProviderSt
       );
     }
 
-    if (_hasError) {
+    if (_hasError || !_mapInitialized) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -506,7 +591,7 @@ class _ClimaGameScreenState extends State<ClimaGameScreen> with TickerProviderSt
             ),
             const SizedBox(height: 16),
             Text(
-              'Failed to load map data',
+              _hasError ? 'Failed to load map data' : 'Initializing map...',
               style: GoogleFonts.questrial(
                 fontSize: 18,
                 color: Colors.grey[600],
@@ -514,7 +599,14 @@ class _ClimaGameScreenState extends State<ClimaGameScreen> with TickerProviderSt
             ),
             const SizedBox(height: 16),
             ElevatedButton(
-              onPressed: _loadData,
+              onPressed: () {
+                setState(() {
+                  _hasError = false;
+                  _isLoading = true;
+                });
+                _initializeMap();
+                _loadData();
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.green,
                 foregroundColor: Colors.white,
@@ -576,37 +668,29 @@ class _ClimaGameScreenState extends State<ClimaGameScreen> with TickerProviderSt
           ),
         ),
         
-        // Placeholder for Google Maps API Key
-        // TODO: Insert your Google Maps API Key here when available
-        // Positioned(
-        //   bottom: 16,
-        //   left: 16,
-        //   child: FloatingActionButton.extended(
-        //     onPressed: () async {
-        //       try {
-        //         await ClimaGameService.createSampleEcores();
-        //         _loadData();
-        //         ScaffoldMessenger.of(context).showSnackBar(
-        //           const SnackBar(
-        //             content: Text('Sample ecores created!'),
-        //             backgroundColor: Colors.green,
-        //           ),
-        //         );
-        //       } catch (e) {
-        //         ScaffoldMessenger.of(context).showSnackBar(
-        //           SnackBar(
-        //             content: Text('Error: $e'),
-        //             backgroundColor: Colors.red,
-        //           ),
-        //         );
-        //       }
-        //     },
-        //     backgroundColor: Colors.green,
-        //     foregroundColor: Colors.white,
-        //     icon: const Icon(Icons.add),
-        //     label: const Text('Create Sample Data'),
-        //   ),
-        // ),
+
+      ],
+    );
+  }
+
+  Widget _buildStatItem(String label, String value) {
+    return Column(
+      children: [
+        Text(
+          value,
+          style: GoogleFonts.questrial(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: Colors.green[700],
+          ),
+        ),
+        Text(
+          label,
+          style: GoogleFonts.questrial(
+            fontSize: 10,
+            color: Colors.grey[600],
+          ),
+        ),
       ],
     );
   }

@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'dart:io';
 import 'firebase_options.dart';
 import 'screens/splash_screen.dart'; 
@@ -19,8 +20,9 @@ import 'utils/env_config.dart'; // Added import for environment configuration
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Environment variables are now hardcoded in EnvConfig
-  print('✅ Using hardcoded API configuration');
+  // Load environment variables from .env file
+  await dotenv.load(fileName: ".env");
+  print('✅ Environment variables loaded');
 
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
