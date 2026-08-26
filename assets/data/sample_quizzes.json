@@ -1,0 +1,879 @@
+{
+  "quizzes": [
+    {
+      "id": "carbon-footprint",
+      "title": "Carbon Footprint & Environmental Impact",
+      "description": "Learn about carbon footprints and how to reduce your environmental impact",
+      "author": "e-icon World Contest",
+      "category": "Sustainability",
+      "questionCount": 10,
+      "timeLimit": 150,
+      "points": 50,
+      "rating": 4.7,
+      "imageUrl": "assets/images/quiz/carbon_footprint.png",
+      "videoUrl": "https://www.youtube.com/watch?v=example4",
+      "questions": [
+        {
+          "id": "cf_1",
+          "question": "What is a carbon footprint?",
+          "answers": [
+            {"id": "cf_1_a", "text": "The size of a person's shoe", "isCorrect": false},
+            {"id": "cf_1_b", "text": "The total amount of carbon dioxide emitted by a person, group, or activity", "isCorrect": true},
+            {"id": "cf_1_c", "text": "Carbon stored in forests", "isCorrect": false},
+            {"id": "cf_1_d", "text": "The black residue from burnt coal", "isCorrect": false}
+          ],
+          "correctAnswerId": "cf_1_b",
+          "explanation": "A carbon footprint measures the total greenhouse gas emissions caused directly or indirectly by an individual, event, organization, or product.",
+          "points": 10
+        },
+        {
+          "id": "cf_2",
+          "question": "Which activity increases your carbon footprint the most?",
+          "answers": [
+            {"id": "cf_2_a", "text": "Using LED light bulbs", "isCorrect": false},
+            {"id": "cf_2_b", "text": "Taking long-haul flights frequently", "isCorrect": true},
+            {"id": "cf_2_c", "text": "Riding a bicycle", "isCorrect": false},
+            {"id": "cf_2_d", "text": "Eating home-cooked meals", "isCorrect": false}
+          ],
+          "correctAnswerId": "cf_2_b",
+          "explanation": "Air travel, especially long flights, generates significant emissions per passenger, making it one of the highest carbon-impact activities.",
+          "points": 10
+        },
+        {
+          "id": "cf_3",
+          "question": "What type of diet generally has the lowest carbon footprint?",
+          "answers": [
+            {"id": "cf_3_a", "text": "High-meat diet", "isCorrect": false},
+            {"id": "cf_3_b", "text": "Plant-based diet", "isCorrect": true},
+            {"id": "cf_3_c", "text": "Seafood-heavy diet", "isCorrect": false},
+            {"id": "cf_3_d", "text": "Fast food-based diet", "isCorrect": false}
+          ],
+          "correctAnswerId": "cf_3_b",
+          "explanation": "Plant-based diets reduce emissions because growing plants typically uses fewer resources and produces less greenhouse gas than raising animals.",
+          "points": 10
+        },
+        {
+          "id": "cf_4",
+          "question": "How can you reduce your carbon footprint at home?",
+          "answers": [
+            {"id": "cf_4_a", "text": "Leave appliances on standby", "isCorrect": false},
+            {"id": "cf_4_b", "text": "Install solar panels", "isCorrect": true},
+            {"id": "cf_4_c", "text": "Use incandescent bulbs", "isCorrect": false},
+            {"id": "cf_4_d", "text": "Heat with coal", "isCorrect": false}
+          ],
+          "correctAnswerId": "cf_4_b",
+          "explanation": "Solar panels generate clean energy from sunlight, reducing the need for fossil fuels and lowering household carbon emissions.",
+          "points": 10
+        },
+        {
+          "id": "cf_5",
+          "question": "Why is public transportation better for the environment than driving alone?",
+          "answers": [
+            {"id": "cf_5_a", "text": "It reduces the number of vehicles and emissions per person", "isCorrect": true},
+            {"id": "cf_5_b", "text": "It increases fuel use", "isCorrect": false},
+            {"id": "cf_5_c", "text": "It encourages car sales", "isCorrect": false},
+            {"id": "cf_5_d", "text": "It uses more road space", "isCorrect": false}
+          ],
+          "correctAnswerId": "cf_5_a",
+          "explanation": "Public transport carries many passengers at once, significantly reducing emissions per person compared to private cars.",
+          "points": 10
+        },
+        {
+          "id": "cf_6",
+          "question": "What is a major benefit of buying local products?",
+          "answers": [
+            {"id": "cf_6_a", "text": "They are always organic", "isCorrect": false},
+            {"id": "cf_6_b", "text": "They support oil companies", "isCorrect": false},
+            {"id": "cf_6_c", "text": "They reduce transport-related emissions", "isCorrect": true},
+            {"id": "cf_6_d", "text": "They are mass-produced", "isCorrect": false}
+          ],
+          "correctAnswerId": "cf_6_c",
+          "explanation": "Locally produced goods travel shorter distances, cutting down on emissions from transportation like ships, trucks, or planes.",
+          "points": 10
+        },
+        {
+          "id": "cf_7",
+          "question": "Which of these helps reduce your digital carbon footprint?",
+          "answers": [
+            {"id": "cf_7_a", "text": "Watching high-resolution videos all day", "isCorrect": false},
+            {"id": "cf_7_b", "text": "Turning off unused devices", "isCorrect": true},
+            {"id": "cf_7_c", "text": "Using multiple cloud accounts", "isCorrect": false},
+            {"id": "cf_7_d", "text": "Sending large files constantly", "isCorrect": false}
+          ],
+          "correctAnswerId": "cf_7_b",
+          "explanation": "Digital activities use energy, especially servers and data centers. Reducing device usage and data storage helps cut emissions.",
+          "points": 10
+        },
+        {
+          "id": "cf_8",
+          "question": "How does energy efficiency help the planet?",
+          "answers": [
+            {"id": "cf_8_a", "text": "It increases energy use", "isCorrect": false},
+            {"id": "cf_8_b", "text": "It delays climate change solutions", "isCorrect": false},
+            {"id": "cf_8_c", "text": "It reduces wasted energy and emissions", "isCorrect": true},
+            {"id": "cf_8_d", "text": "It makes electricity cheaper", "isCorrect": false}
+          ],
+          "correctAnswerId": "cf_8_c",
+          "explanation": "Energy-efficient appliances and systems use less energy to perform the same tasks, helping reduce overall demand and emissions.",
+          "points": 10
+        },
+        {
+          "id": "cf_9",
+          "question": "Which is the most eco-friendly mode of transport for short distances?",
+          "answers": [
+            {"id": "cf_9_a", "text": "Gasoline cars", "isCorrect": false},
+            {"id": "cf_9_b", "text": "Electric scooters", "isCorrect": true},
+            {"id": "cf_9_c", "text": "Diesel trucks", "isCorrect": false},
+            {"id": "cf_9_d", "text": "Helicopters", "isCorrect": false}
+          ],
+          "correctAnswerId": "cf_9_b",
+          "explanation": "Electric scooters are emission-free during use and are ideal for short trips, helping reduce fossil fuel reliance.",
+          "points": 10
+        },
+        {
+          "id": "cf_10",
+          "question": "What does \"carbon offsetting\" mean?",
+          "answers": [
+            {"id": "cf_10_a", "text": "Ignoring your emissions", "isCorrect": false},
+            {"id": "cf_10_b", "text": "Investing in carbon-intensive industries", "isCorrect": false},
+            {"id": "cf_10_c", "text": "Funding projects that reduce emissions elsewhere", "isCorrect": true},
+            {"id": "cf_10_d", "text": "Measuring your weight", "isCorrect": false}
+          ],
+          "correctAnswerId": "cf_10_c",
+          "explanation": "Carbon offsetting compensates for your emissions by supporting projects like tree planting or renewable energy, balancing your impact.",
+          "points": 10
+        }
+      ]
+    },
+    {
+      "id": "climate-causes",
+      "title": "Climate Change Causes & Human Impact",
+      "description": "Explore the various causes of climate change and human impact on the environment",
+      "author": "e-icon World Contest",
+      "category": "Climate Science",
+      "questionCount": 10,
+      "timeLimit": 150,
+      "points": 50,
+      "rating": 4.6,
+      "imageUrl": "assets/images/quiz/climate_causes.png",
+      "videoUrl": "https://www.youtube.com/watch?v=example5",
+      "questions": [
+        {
+          "id": "causes_1",
+          "question": "What is the main cause of current climate change?",
+          "answers": [
+            {"id": "causes_1_a", "text": "Volcanic eruptions", "isCorrect": false},
+            {"id": "causes_1_b", "text": "Earth's orbit", "isCorrect": false},
+            {"id": "causes_1_c", "text": "Human activities like burning fossil fuels", "isCorrect": true},
+            {"id": "causes_1_d", "text": "Solar flares", "isCorrect": false}
+          ],
+          "correctAnswerId": "causes_1_c",
+          "explanation": "Human activities, especially burning fossil fuels, are the primary driver of today's rapid climate change.",
+          "points": 10
+        },
+        {
+          "id": "causes_2",
+          "question": "Which gas is the most emitted greenhouse gas by human activities?",
+          "answers": [
+            {"id": "causes_2_a", "text": "Methane", "isCorrect": false},
+            {"id": "causes_2_b", "text": "Nitrous oxide", "isCorrect": false},
+            {"id": "causes_2_c", "text": "Carbon dioxide", "isCorrect": true},
+            {"id": "causes_2_d", "text": "Chlorofluorocarbons", "isCorrect": false}
+          ],
+          "correctAnswerId": "causes_2_c",
+          "explanation": "Carbon dioxide (CO₂) is the most emitted greenhouse gas, mainly from burning fossil fuels.",
+          "points": 10
+        },
+        {
+          "id": "causes_3",
+          "question": "What is a key contributor to deforestation?",
+          "answers": [
+            {"id": "causes_3_a", "text": "Urban gardening", "isCorrect": false},
+            {"id": "causes_3_b", "text": "Industrial agriculture", "isCorrect": true},
+            {"id": "causes_3_c", "text": "Public transportation", "isCorrect": false},
+            {"id": "causes_3_d", "text": "Organic farming", "isCorrect": false}
+          ],
+          "correctAnswerId": "causes_3_b",
+          "explanation": "Large-scale agriculture drives deforestation by clearing forests for crops or livestock.",
+          "points": 10
+        },
+        {
+          "id": "causes_4",
+          "question": "Which sector is the largest source of greenhouse gas emissions?",
+          "answers": [
+            {"id": "causes_4_a", "text": "Energy production", "isCorrect": true},
+            {"id": "causes_4_b", "text": "Retail", "isCorrect": false},
+            {"id": "causes_4_c", "text": "Fishing", "isCorrect": false},
+            {"id": "causes_4_d", "text": "Healthcare", "isCorrect": false}
+          ],
+          "correctAnswerId": "causes_4_a",
+          "explanation": "Energy production (mainly fossil fuel burning) is the largest contributor to global emissions.",
+          "points": 10
+        },
+        {
+          "id": "causes_5",
+          "question": "What human activity leads to ocean acidification?",
+          "answers": [
+            {"id": "causes_5_a", "text": "Plastic dumping", "isCorrect": false},
+            {"id": "causes_5_b", "text": "CO₂ emissions", "isCorrect": true},
+            {"id": "causes_5_c", "text": "Fishing", "isCorrect": false},
+            {"id": "causes_5_d", "text": "Oil spills", "isCorrect": false}
+          ],
+          "correctAnswerId": "causes_5_b",
+          "explanation": "CO₂ dissolves into oceans, lowering pH and harming marine life—a process called ocean acidification.",
+          "points": 10
+        },
+        {
+          "id": "causes_6",
+          "question": "How does transportation affect the climate?",
+          "answers": [
+            {"id": "causes_6_a", "text": "It filters pollutants", "isCorrect": false},
+            {"id": "causes_6_b", "text": "It cools cities", "isCorrect": false},
+            {"id": "causes_6_c", "text": "It releases large amounts of greenhouse gases", "isCorrect": true},
+            {"id": "causes_6_d", "text": "It has no climate impact", "isCorrect": false}
+          ],
+          "correctAnswerId": "causes_6_c",
+          "explanation": "Cars, planes, and ships run on fossil fuels, emitting CO₂ and other warming gases.",
+          "points": 10
+        },
+        {
+          "id": "causes_7",
+          "question": "What impact does meat production have on climate?",
+          "answers": [
+            {"id": "causes_7_a", "text": "It increases forest cover", "isCorrect": false},
+            {"id": "causes_7_b", "text": "It reduces emissions", "isCorrect": false},
+            {"id": "causes_7_c", "text": "It increases methane emissions", "isCorrect": true},
+            {"id": "causes_7_d", "text": "It produces clean energy", "isCorrect": false}
+          ],
+          "correctAnswerId": "causes_7_c",
+          "explanation": "Livestock farming produces methane, a potent greenhouse gas, especially from cows.",
+          "points": 10
+        },
+        {
+          "id": "causes_8",
+          "question": "Which industry is responsible for significant industrial pollution?",
+          "answers": [
+            {"id": "causes_8_a", "text": "Textile industry", "isCorrect": false},
+            {"id": "causes_8_b", "text": "Chemical industry", "isCorrect": true},
+            {"id": "causes_8_c", "text": "Tourism", "isCorrect": false},
+            {"id": "causes_8_d", "text": "Sports", "isCorrect": false}
+          ],
+          "correctAnswerId": "causes_8_b",
+          "explanation": "The chemical industry emits large amounts of GHGs and harmful pollutants during production.",
+          "points": 10
+        },
+        {
+          "id": "causes_9",
+          "question": "What happens when forests are cleared?",
+          "answers": [
+            {"id": "causes_9_a", "text": "CO₂ levels decrease", "isCorrect": false},
+            {"id": "causes_9_b", "text": "Oxygen increases", "isCorrect": false},
+            {"id": "causes_9_c", "text": "Stored carbon is released", "isCorrect": true},
+            {"id": "causes_9_d", "text": "Rainfall increases", "isCorrect": false}
+          ],
+          "correctAnswerId": "causes_9_c",
+          "explanation": "Trees store carbon. When cut or burned, they release CO₂, accelerating climate change.",
+          "points": 10
+        },
+        {
+          "id": "causes_10",
+          "question": "Which is a direct human impact on biodiversity due to climate change?",
+          "answers": [
+            {"id": "causes_10_a", "text": "Increase in global forests", "isCorrect": false},
+            {"id": "causes_10_b", "text": "Melting glaciers", "isCorrect": false},
+            {"id": "causes_10_c", "text": "Habitat loss and species extinction", "isCorrect": true},
+            {"id": "causes_10_d", "text": "More rainfall", "isCorrect": false}
+          ],
+          "correctAnswerId": "causes_10_c",
+          "explanation": "Warming, habitat destruction, and changing ecosystems threaten countless species worldwide.",
+          "points": 10
+        }
+      ]
+    },
+    {
+      "id": "climate-fundamentals",
+      "title": "Climate Change Fundamentals",
+      "description": "Learn about the fundamentals of climate change and its impact on our planet",
+      "author": "e-icon World Contest",
+      "category": "Climate Science",
+      "questionCount": 10,
+      "timeLimit": 150,
+      "points": 50,
+      "rating": 4.5,
+      "imageUrl": "assets/images/quiz/climate_fundamentals.png",
+      "videoUrl": "https://www.youtube.com/watch?v=example6",
+      "questions": [
+        {
+          "id": "fund_1",
+          "question": "What is climate change?",
+          "answers": [
+            {"id": "fund_1_a", "text": "Change in daily weather", "isCorrect": false},
+            {"id": "fund_1_b", "text": "Long-term change in global climate patterns", "isCorrect": true},
+            {"id": "fund_1_c", "text": "Seasonal variation", "isCorrect": false},
+            {"id": "fund_1_d", "text": "A short-term cold wave", "isCorrect": false}
+          ],
+          "correctAnswerId": "fund_1_b",
+          "explanation": "Climate change refers to long-term alterations in temperature and weather patterns over decades.",
+          "points": 10
+        },
+        {
+          "id": "fund_2",
+          "question": "What causes the greenhouse effect?",
+          "answers": [
+            {"id": "fund_2_a", "text": "Trees absorbing heat", "isCorrect": false},
+            {"id": "fund_2_b", "text": "The ozone layer", "isCorrect": false},
+            {"id": "fund_2_c", "text": "Gases like CO₂ and methane trapping heat", "isCorrect": true},
+            {"id": "fund_2_d", "text": "Earth's rotation", "isCorrect": false}
+          ],
+          "correctAnswerId": "fund_2_c",
+          "explanation": "Greenhouse gases trap heat in the atmosphere, keeping Earth warm—but excess causes warming.",
+          "points": 10
+        },
+        {
+          "id": "fund_3",
+          "question": "Which is a natural greenhouse gas?",
+          "answers": [
+            {"id": "fund_3_a", "text": "Nitrogen", "isCorrect": false},
+            {"id": "fund_3_b", "text": "Oxygen", "isCorrect": false},
+            {"id": "fund_3_c", "text": "Methane", "isCorrect": true},
+            {"id": "fund_3_d", "text": "Argon", "isCorrect": false}
+          ],
+          "correctAnswerId": "fund_3_c",
+          "explanation": "Methane occurs naturally and through human activities like agriculture and fossil fuel use.",
+          "points": 10
+        },
+        {
+          "id": "fund_4",
+          "question": "Which layer of the Earth is directly impacted by global warming?",
+          "answers": [
+            {"id": "fund_4_a", "text": "Inner core", "isCorrect": false},
+            {"id": "fund_4_b", "text": "Crust", "isCorrect": false},
+            {"id": "fund_4_c", "text": "Atmosphere", "isCorrect": true},
+            {"id": "fund_4_d", "text": "Mantle", "isCorrect": false}
+          ],
+          "correctAnswerId": "fund_4_c",
+          "explanation": "The atmosphere absorbs greenhouse gases and heat, leading to warming effects.",
+          "points": 10
+        },
+        {
+          "id": "fund_5",
+          "question": "Which region is most sensitive to climate change?",
+          "answers": [
+            {"id": "fund_5_a", "text": "Equator", "isCorrect": false},
+            {"id": "fund_5_b", "text": "Temperate zones", "isCorrect": false},
+            {"id": "fund_5_c", "text": "Polar regions", "isCorrect": true},
+            {"id": "fund_5_d", "text": "Deserts", "isCorrect": false}
+          ],
+          "correctAnswerId": "fund_5_c",
+          "explanation": "Polar regions warm faster due to ice melt and feedback effects, disrupting global climate.",
+          "points": 10
+        },
+        {
+          "id": "fund_6",
+          "question": "What is one result of glacier melting?",
+          "answers": [
+            {"id": "fund_6_a", "text": "More agriculture", "isCorrect": false},
+            {"id": "fund_6_b", "text": "Ocean level rise", "isCorrect": true},
+            {"id": "fund_6_c", "text": "Desert formation", "isCorrect": false},
+            {"id": "fund_6_d", "text": "Increased snowfall", "isCorrect": false}
+          ],
+          "correctAnswerId": "fund_6_b",
+          "explanation": "As glaciers melt, the water adds to the ocean volume, raising sea levels globally.",
+          "points": 10
+        },
+        {
+          "id": "fund_7",
+          "question": "What is a climate model?",
+          "answers": [
+            {"id": "fund_7_a", "text": "A weather robot", "isCorrect": false},
+            {"id": "fund_7_b", "text": "A person predicting weather", "isCorrect": false},
+            {"id": "fund_7_c", "text": "A computer simulation of Earth's climate", "isCorrect": true},
+            {"id": "fund_7_d", "text": "A satellite", "isCorrect": false}
+          ],
+          "correctAnswerId": "fund_7_c",
+          "explanation": "Scientists use models to simulate and predict future climate scenarios using data.",
+          "points": 10
+        },
+        {
+          "id": "fund_8",
+          "question": "Which of the following is a sign of climate change?",
+          "answers": [
+            {"id": "fund_8_a", "text": "Stable global temperatures", "isCorrect": false},
+            {"id": "fund_8_b", "text": "Shrinking ice caps", "isCorrect": true},
+            {"id": "fund_8_c", "text": "Regular rainfall", "isCorrect": false},
+            {"id": "fund_8_d", "text": "Increased snowfall", "isCorrect": false}
+          ],
+          "correctAnswerId": "fund_8_b",
+          "explanation": "The reduction of Arctic and Antarctic ice is a direct result of warming temperatures.",
+          "points": 10
+        },
+        {
+          "id": "fund_9",
+          "question": "Which natural disaster is not directly linked to climate change?",
+          "answers": [
+            {"id": "fund_9_a", "text": "Earthquake", "isCorrect": true},
+            {"id": "fund_9_b", "text": "Flood", "isCorrect": false},
+            {"id": "fund_9_c", "text": "Drought", "isCorrect": false},
+            {"id": "fund_9_d", "text": "Heatwave", "isCorrect": false}
+          ],
+          "correctAnswerId": "fund_9_a",
+          "explanation": "Earthquakes are geological events, not climate-related.",
+          "points": 10
+        },
+        {
+          "id": "fund_10",
+          "question": "Why are extreme weather events increasing?",
+          "answers": [
+            {"id": "fund_10_a", "text": "Solar storms", "isCorrect": false},
+            {"id": "fund_10_b", "text": "Warmer oceans and atmosphere intensify storms", "isCorrect": true},
+            {"id": "fund_10_c", "text": "Moon phases", "isCorrect": false},
+            {"id": "fund_10_d", "text": "Better forecasting", "isCorrect": false}
+          ],
+          "correctAnswerId": "fund_10_b",
+          "explanation": "A warmer climate means more evaporation, energy, and intensity for storms and heatwaves.",
+          "points": 10
+        }
+      ]
+    },
+    {
+      "id": "renewable-energy",
+      "title": "Renewable Energy Technologies",
+      "description": "Test your knowledge about solar, wind, hydroelectric, and other renewable energy technologies",
+      "author": "e-icon World Contest",
+      "category": "Energy",
+      "questionCount": 10,
+      "timeLimit": 150,
+      "points": 50,
+      "rating": 4.4,
+      "imageUrl": "assets/images/quiz/renewable_energy.png",
+      "videoUrl": "https://www.youtube.com/watch?v=example7",
+      "questions": [
+        {
+          "id": "re_1",
+          "question": "Which is a renewable energy source?",
+          "answers": [
+            {"id": "re_1_a", "text": "Coal", "isCorrect": false},
+            {"id": "re_1_b", "text": "Natural gas", "isCorrect": false},
+            {"id": "re_1_c", "text": "Wind", "isCorrect": true},
+            {"id": "re_1_d", "text": "Diesel", "isCorrect": false}
+          ],
+          "correctAnswerId": "re_1_c",
+          "explanation": "Wind is clean and renewable—it doesn't deplete over time or emit greenhouse gases.",
+          "points": 10
+        },
+        {
+          "id": "re_2",
+          "question": "What do solar panels convert sunlight into?",
+          "answers": [
+            {"id": "re_2_a", "text": "Water", "isCorrect": false},
+            {"id": "re_2_b", "text": "Heat only", "isCorrect": false},
+            {"id": "re_2_c", "text": "Electricity", "isCorrect": true},
+            {"id": "re_2_d", "text": "Carbon", "isCorrect": false}
+          ],
+          "correctAnswerId": "re_2_c",
+          "explanation": "Solar panels use photovoltaic cells to convert sunlight into usable electrical energy.",
+          "points": 10
+        },
+        {
+          "id": "re_3",
+          "question": "Which device captures wind energy?",
+          "answers": [
+            {"id": "re_3_a", "text": "Solar heater", "isCorrect": false},
+            {"id": "re_3_b", "text": "Gas turbine", "isCorrect": false},
+            {"id": "re_3_c", "text": "Wind turbine", "isCorrect": true},
+            {"id": "re_3_d", "text": "Electric generator", "isCorrect": false}
+          ],
+          "correctAnswerId": "re_3_c",
+          "explanation": "Wind turbines use blades and generators to turn wind into electricity.",
+          "points": 10
+        },
+        {
+          "id": "re_4",
+          "question": "What is the main requirement for hydroelectric power?",
+          "answers": [
+            {"id": "re_4_a", "text": "Wind", "isCorrect": false},
+            {"id": "re_4_b", "text": "Sun", "isCorrect": false},
+            {"id": "re_4_c", "text": "Flowing water", "isCorrect": true},
+            {"id": "re_4_d", "text": "Natural gas", "isCorrect": false}
+          ],
+          "correctAnswerId": "re_4_c",
+          "explanation": "Hydropower depends on moving water, such as rivers or dams, to generate electricity.",
+          "points": 10
+        },
+        {
+          "id": "re_5",
+          "question": "Which energy source releases the most carbon dioxide?",
+          "answers": [
+            {"id": "re_5_a", "text": "Solar", "isCorrect": false},
+            {"id": "re_5_b", "text": "Hydroelectric", "isCorrect": false},
+            {"id": "re_5_c", "text": "Coal", "isCorrect": true},
+            {"id": "re_5_d", "text": "Wind", "isCorrect": false}
+          ],
+          "correctAnswerId": "re_5_c",
+          "explanation": "Coal is the dirtiest fossil fuel, emitting the highest CO₂ per unit of energy.",
+          "points": 10
+        },
+        {
+          "id": "re_6",
+          "question": "What is geothermal energy?",
+          "answers": [
+            {"id": "re_6_a", "text": "Sunlight energy", "isCorrect": false},
+            {"id": "re_6_b", "text": "Heat from Earth's interior", "isCorrect": true},
+            {"id": "re_6_c", "text": "Moonlight energy", "isCorrect": false},
+            {"id": "re_6_d", "text": "Wind-based energy", "isCorrect": false}
+          ],
+          "correctAnswerId": "re_6_b",
+          "explanation": "Geothermal energy taps into the natural heat beneath Earth's surface to produce power.",
+          "points": 10
+        },
+        {
+          "id": "re_7",
+          "question": "Which renewable source is most reliable regardless of weather?",
+          "answers": [
+            {"id": "re_7_a", "text": "Wind", "isCorrect": false},
+            {"id": "re_7_b", "text": "Solar", "isCorrect": false},
+            {"id": "re_7_c", "text": "Geothermal", "isCorrect": true},
+            {"id": "re_7_d", "text": "Tidal", "isCorrect": false}
+          ],
+          "correctAnswerId": "re_7_c",
+          "explanation": "Geothermal is constant—it doesn't depend on weather like solar or wind.",
+          "points": 10
+        },
+        {
+          "id": "re_8",
+          "question": "What does \"net metering\" allow solar panel users to do?",
+          "answers": [
+            {"id": "re_8_a", "text": "Measure rainfall", "isCorrect": false},
+            {"id": "re_8_b", "text": "Sell extra electricity to the grid", "isCorrect": true},
+            {"id": "re_8_c", "text": "Store water", "isCorrect": false},
+            {"id": "re_8_d", "text": "Charge batteries", "isCorrect": false}
+          ],
+          "correctAnswerId": "re_8_b",
+          "explanation": "Net metering allows users to earn credit or money for excess power they generate.",
+          "points": 10
+        },
+        {
+          "id": "re_9",
+          "question": "Which material is most used in solar cells?",
+          "answers": [
+            {"id": "re_9_a", "text": "Iron", "isCorrect": false},
+            {"id": "re_9_b", "text": "Silicon", "isCorrect": true},
+            {"id": "re_9_c", "text": "Copper", "isCorrect": false},
+            {"id": "re_9_d", "text": "Glass", "isCorrect": false}
+          ],
+          "correctAnswerId": "re_9_b",
+          "explanation": "Silicon is a semiconductor widely used in photovoltaic (solar) cells for energy conversion.",
+          "points": 10
+        },
+        {
+          "id": "re_10",
+          "question": "Which is a benefit of renewable energy?",
+          "answers": [
+            {"id": "re_10_a", "text": "Depletes natural resources", "isCorrect": false},
+            {"id": "re_10_b", "text": "Emits high CO₂", "isCorrect": false},
+            {"id": "re_10_c", "text": "Reduces air pollution", "isCorrect": true},
+            {"id": "re_10_d", "text": "Requires oil imports", "isCorrect": false}
+          ],
+          "correctAnswerId": "re_10_c",
+          "explanation": "Renewable energy sources like solar and wind produce electricity without harmful emissions.",
+          "points": 10
+        }
+      ]
+    },
+    {
+      "id": "sdg13-climate-action",
+      "title": "SDG 13: Climate Action",
+      "description": "Understanding the United Nations Sustainable Development Goal 13 and climate action initiatives",
+      "author": "e-icon World Contest",
+      "category": "Sustainability",
+      "questionCount": 10,
+      "timeLimit": 150,
+      "points": 50,
+      "rating": 4.3,
+      "imageUrl": "assets/images/quiz/sdg13_climate.png",
+      "videoUrl": "https://www.youtube.com/watch?v=example8",
+      "questions": [
+        {
+          "id": "sdg13_1",
+          "question": "What is the aim of SDG 13?",
+          "answers": [
+            {"id": "sdg13_1_a", "text": "Promote agriculture", "isCorrect": false},
+            {"id": "sdg13_1_b", "text": "Eliminate poverty", "isCorrect": false},
+            {"id": "sdg13_1_c", "text": "Combat climate change", "isCorrect": true},
+            {"id": "sdg13_1_d", "text": "Improve literacy", "isCorrect": false}
+          ],
+          "correctAnswerId": "sdg13_1_c",
+          "explanation": "SDG 13 is focused on urgent action to address climate change and its impacts globally.",
+          "points": 10
+        },
+        {
+          "id": "sdg13_2",
+          "question": "When was the Paris Agreement signed?",
+          "answers": [
+            {"id": "sdg13_2_a", "text": "1992", "isCorrect": false},
+            {"id": "sdg13_2_b", "text": "2000", "isCorrect": false},
+            {"id": "sdg13_2_c", "text": "2015", "isCorrect": true},
+            {"id": "sdg13_2_d", "text": "2020", "isCorrect": false}
+          ],
+          "correctAnswerId": "sdg13_2_c",
+          "explanation": "The Paris Agreement was adopted in 2015 to strengthen the global response to climate change.",
+          "points": 10
+        },
+        {
+          "id": "sdg13_3",
+          "question": "What is the key goal of the Paris Agreement?",
+          "answers": [
+            {"id": "sdg13_3_a", "text": "Eliminate fossil fuels", "isCorrect": false},
+            {"id": "sdg13_3_b", "text": "Keep global warming below 2°C", "isCorrect": true},
+            {"id": "sdg13_3_c", "text": "Ban transportation", "isCorrect": false},
+            {"id": "sdg13_3_d", "text": "Build more factories", "isCorrect": false}
+          ],
+          "correctAnswerId": "sdg13_3_b",
+          "explanation": "The agreement seeks to limit warming to well below 2°C, ideally 1.5°C, above pre-industrial levels.",
+          "points": 10
+        },
+        {
+          "id": "sdg13_4",
+          "question": "Which group is most responsible for implementing SDG 13?",
+          "answers": [
+            {"id": "sdg13_4_a", "text": "Movie actors", "isCorrect": false},
+            {"id": "sdg13_4_b", "text": "National governments", "isCorrect": true},
+            {"id": "sdg13_4_c", "text": "Students", "isCorrect": false},
+            {"id": "sdg13_4_d", "text": "Tourists", "isCorrect": false}
+          ],
+          "correctAnswerId": "sdg13_4_b",
+          "explanation": "Governments must create and enforce policies to reduce emissions and prepare for climate impacts.",
+          "points": 10
+        },
+        {
+          "id": "sdg13_5",
+          "question": "What is the Green Climate Fund?",
+          "answers": [
+            {"id": "sdg13_5_a", "text": "Bank for fossil fuels", "isCorrect": false},
+            {"id": "sdg13_5_b", "text": "Funding for green fashion", "isCorrect": false},
+            {"id": "sdg13_5_c", "text": "International climate finance for developing countries", "isCorrect": true},
+            {"id": "sdg13_5_d", "text": "Forest tax fund", "isCorrect": false}
+          ],
+          "correctAnswerId": "sdg13_5_c",
+          "explanation": "It helps poorer countries build resilience and shift to low-emission development paths.",
+          "points": 10
+        },
+        {
+          "id": "sdg13_6",
+          "question": "What is \"adaptation\" in climate policy?",
+          "answers": [
+            {"id": "sdg13_6_a", "text": "Preventing rainfall", "isCorrect": false},
+            {"id": "sdg13_6_b", "text": "Adjusting to climate effects", "isCorrect": true},
+            {"id": "sdg13_6_c", "text": "Ignoring climate threats", "isCorrect": false},
+            {"id": "sdg13_6_d", "text": "Building skyscrapers", "isCorrect": false}
+          ],
+          "correctAnswerId": "sdg13_6_b",
+          "explanation": "Adaptation means preparing for climate impacts—like sea walls, drought-resistant crops, etc.",
+          "points": 10
+        },
+        {
+          "id": "sdg13_7",
+          "question": "Which action supports SDG 13 personally?",
+          "answers": [
+            {"id": "sdg13_7_a", "text": "Using more plastic", "isCorrect": false},
+            {"id": "sdg13_7_b", "text": "Saving electricity", "isCorrect": true},
+            {"id": "sdg13_7_c", "text": "Flying often", "isCorrect": false},
+            {"id": "sdg13_7_d", "text": "Wasting food", "isCorrect": false}
+          ],
+          "correctAnswerId": "sdg13_7_b",
+          "explanation": "Reducing electricity use lowers emissions and supports sustainability goals.",
+          "points": 10
+        },
+        {
+          "id": "sdg13_8",
+          "question": "What are NDCs in climate talks?",
+          "answers": [
+            {"id": "sdg13_8_a", "text": "National Directives for Coal", "isCorrect": false},
+            {"id": "sdg13_8_b", "text": "New Development Cities", "isCorrect": false},
+            {"id": "sdg13_8_c", "text": "Nationally Determined Contributions", "isCorrect": true},
+            {"id": "sdg13_8_d", "text": "Nuclear Defense Councils", "isCorrect": false}
+          ],
+          "correctAnswerId": "sdg13_8_c",
+          "explanation": "NDCs are emission reduction plans that countries commit to under the Paris Agreement.",
+          "points": 10
+        },
+        {
+          "id": "sdg13_9",
+          "question": "Which global body oversees the SDGs?",
+          "answers": [
+            {"id": "sdg13_9_a", "text": "NATO", "isCorrect": false},
+            {"id": "sdg13_9_b", "text": "FIFA", "isCorrect": false},
+            {"id": "sdg13_9_c", "text": "United Nations", "isCorrect": true},
+            {"id": "sdg13_9_d", "text": "OPEC", "isCorrect": false}
+          ],
+          "correctAnswerId": "sdg13_9_c",
+          "explanation": "The UN developed and monitors the 17 Sustainable Development Goals, including SDG 13.",
+          "points": 10
+        },
+        {
+          "id": "sdg13_10",
+          "question": "What is \"loss and damage\" in climate negotiations?",
+          "answers": [
+            {"id": "sdg13_10_a", "text": "Lost internet", "isCorrect": false},
+            {"id": "sdg13_10_b", "text": "Compensation for climate harm in vulnerable countries", "isCorrect": true},
+            {"id": "sdg13_10_c", "text": "Earthquake relief", "isCorrect": false},
+            {"id": "sdg13_10_d", "text": "Trade deficits", "isCorrect": false}
+          ],
+          "correctAnswerId": "sdg13_10_b",
+          "explanation": "\"Loss and damage\" refers to funding and support for countries facing irreversible climate impacts.",
+          "points": 10
+        }
+      ]
+    },
+    {
+      "id": "climate-fundamentals-2",
+      "title": "Climate Change Fundamentals & Global Impacts",
+      "description": "Learn about the fundamentals of climate change and its impact on our planet.",
+      "author": "e-icon World Contest",
+      "category": "Climate Science",
+      "questionCount": 10,
+      "timeLimit": 150,
+      "points": 50,
+      "rating": 4.5,
+      "imageUrl": "assets/images/quiz/climate_fundamentals.png",
+      "videoUrl": "https://www.youtube.com/watch?v=example6",
+      "questions": [
+        {"id": "cf2_1", "question": "What is climate change?", "answers": [
+          {"id": "cf2_1_a", "text": "Change in daily weather", "isCorrect": false},
+          {"id": "cf2_1_b", "text": "Long-term change in global climate patterns", "isCorrect": true},
+          {"id": "cf2_1_c", "text": "Seasonal variation", "isCorrect": false},
+          {"id": "cf2_1_d", "text": "A short-term cold wave", "isCorrect": false}
+        ], "correctAnswerId": "cf2_1_b", "explanation": "Climate change refers to long-term alterations in temperature and weather patterns over decades.", "points": 10},
+        {"id": "cf2_2", "question": "What causes the greenhouse effect?", "answers": [
+          {"id": "cf2_2_a", "text": "Trees absorbing heat", "isCorrect": false},
+          {"id": "cf2_2_b", "text": "The ozone layer", "isCorrect": false},
+          {"id": "cf2_2_c", "text": "Gases like CO₂ and methane trapping heat", "isCorrect": true},
+          {"id": "cf2_2_d", "text": "Earth's rotation", "isCorrect": false}
+        ], "correctAnswerId": "cf2_2_c", "explanation": "Greenhouse gases trap heat in the atmosphere, keeping Earth warm—but excess causes warming.", "points": 10},
+        {"id": "cf2_3", "question": "Which is a natural greenhouse gas?", "answers": [
+          {"id": "cf2_3_a", "text": "Nitrogen", "isCorrect": false},
+          {"id": "cf2_3_b", "text": "Oxygen", "isCorrect": false},
+          {"id": "cf2_3_c", "text": "Methane", "isCorrect": true},
+          {"id": "cf2_3_d", "text": "Argon", "isCorrect": false}
+        ], "correctAnswerId": "cf2_3_c", "explanation": "Methane occurs naturally and through human activities like agriculture and fossil fuel use.", "points": 10},
+        {"id": "cf2_4", "question": "Which layer of the Earth is directly impacted by global warming?", "answers": [
+          {"id": "cf2_4_a", "text": "Inner core", "isCorrect": false},
+          {"id": "cf2_4_b", "text": "Crust", "isCorrect": false},
+          {"id": "cf2_4_c", "text": "Atmosphere", "isCorrect": true},
+          {"id": "cf2_4_d", "text": "Mantle", "isCorrect": false}
+        ], "correctAnswerId": "cf2_4_c", "explanation": "The atmosphere absorbs greenhouse gases and heat, leading to warming effects.", "points": 10},
+        {"id": "cf2_5", "question": "Which region is most sensitive to climate change?", "answers": [
+          {"id": "cf2_5_a", "text": "Equator", "isCorrect": false},
+          {"id": "cf2_5_b", "text": "Temperate zones", "isCorrect": false},
+          {"id": "cf2_5_c", "text": "Polar regions", "isCorrect": true},
+          {"id": "cf2_5_d", "text": "Deserts", "isCorrect": false}
+        ], "correctAnswerId": "cf2_5_c", "explanation": "Polar regions warm faster due to ice melt and feedback effects, disrupting global climate.", "points": 10},
+        {"id": "cf2_6", "question": "What is one result of glacier melting?", "answers": [
+          {"id": "cf2_6_a", "text": "More agriculture", "isCorrect": false},
+          {"id": "cf2_6_b", "text": "Ocean level rise", "isCorrect": true},
+          {"id": "cf2_6_c", "text": "Desert formation", "isCorrect": false},
+          {"id": "cf2_6_d", "text": "Increased snowfall", "isCorrect": false}
+        ], "correctAnswerId": "cf2_6_b", "explanation": "As glaciers melt, the water adds to the ocean volume, raising sea levels globally.", "points": 10},
+        {"id": "cf2_7", "question": "What is a climate model?", "answers": [
+          {"id": "cf2_7_a", "text": "A weather robot", "isCorrect": false},
+          {"id": "cf2_7_b", "text": "A person predicting weather", "isCorrect": false},
+          {"id": "cf2_7_c", "text": "A computer simulation of Earth's climate", "isCorrect": true},
+          {"id": "cf2_7_d", "text": "A satellite", "isCorrect": false}
+        ], "correctAnswerId": "cf2_7_c", "explanation": "Scientists use models to simulate and predict future climate scenarios using data.", "points": 10},
+        {"id": "cf2_8", "question": "Which of the following is a sign of climate change?", "answers": [
+          {"id": "cf2_8_a", "text": "Stable global temperatures", "isCorrect": false},
+          {"id": "cf2_8_b", "text": "Shrinking ice caps", "isCorrect": true},
+          {"id": "cf2_8_c", "text": "Regular rainfall", "isCorrect": false},
+          {"id": "cf2_8_d", "text": "Increased snowfall", "isCorrect": false}
+        ], "correctAnswerId": "cf2_8_b", "explanation": "The reduction of Arctic and Antarctic ice is a direct result of warming temperatures.", "points": 10},
+        {"id": "cf2_9", "question": "Which natural disaster is not directly linked to climate change?", "answers": [
+          {"id": "cf2_9_a", "text": "Earthquake", "isCorrect": true},
+          {"id": "cf2_9_b", "text": "Flood", "isCorrect": false},
+          {"id": "cf2_9_c", "text": "Drought", "isCorrect": false},
+          {"id": "cf2_9_d", "text": "Heatwave", "isCorrect": false}
+        ], "correctAnswerId": "cf2_9_a", "explanation": "Earthquakes are geological events, not climate-related.", "points": 10},
+        {"id": "cf2_10", "question": "Why are extreme weather events increasing?", "answers": [
+          {"id": "cf2_10_a", "text": "Solar storms", "isCorrect": false},
+          {"id": "cf2_10_b", "text": "Warmer oceans and atmosphere intensify storms", "isCorrect": true},
+          {"id": "cf2_10_c", "text": "Moon phases", "isCorrect": false},
+          {"id": "cf2_10_d", "text": "Better forecasting", "isCorrect": false}
+        ], "correctAnswerId": "cf2_10_b", "explanation": "A warmer climate means more evaporation, energy, and intensity for storms and heatwaves.", "points": 10}
+      ]
+    },
+    {
+      "id": "sdg13-climate-action-2",
+      "title": "SDG 13 & Global Climate Action Initiatives",
+      "description": "Understanding the United Nations Sustainable Development Goal 13 and climate action initiatives.",
+      "author": "e-icon World Contest",
+      "category": "Sustainability",
+      "questionCount": 10,
+      "timeLimit": 150,
+      "points": 50,
+      "rating": 4.3,
+      "imageUrl": "assets/images/quiz/sdg13_climate.png",
+      "videoUrl": "https://www.youtube.com/watch?v=example8",
+      "questions": [
+        {"id": "sdg13_2_1", "question": "What is the aim of SDG 13?", "answers": [
+          {"id": "sdg13_2_1_a", "text": "Promote agriculture", "isCorrect": false},
+          {"id": "sdg13_2_1_b", "text": "Eliminate poverty", "isCorrect": false},
+          {"id": "sdg13_2_1_c", "text": "Combat climate change", "isCorrect": true},
+          {"id": "sdg13_2_1_d", "text": "Improve literacy", "isCorrect": false}
+        ], "correctAnswerId": "sdg13_2_1_c", "explanation": "SDG 13 is focused on urgent action to address climate change and its impacts globally.", "points": 10},
+        {"id": "sdg13_2_2", "question": "When was the Paris Agreement signed?", "answers": [
+          {"id": "sdg13_2_2_a", "text": "1992", "isCorrect": false},
+          {"id": "sdg13_2_2_b", "text": "2000", "isCorrect": false},
+          {"id": "sdg13_2_2_c", "text": "2015", "isCorrect": true},
+          {"id": "sdg13_2_2_d", "text": "2020", "isCorrect": false}
+        ], "correctAnswerId": "sdg13_2_2_c", "explanation": "The Paris Agreement was adopted in 2015 to strengthen the global response to climate change.", "points": 10},
+        {"id": "sdg13_2_3", "question": "What is the key goal of the Paris Agreement?", "answers": [
+          {"id": "sdg13_2_3_a", "text": "Eliminate fossil fuels", "isCorrect": false},
+          {"id": "sdg13_2_3_b", "text": "Keep global warming below 2°C", "isCorrect": true},
+          {"id": "sdg13_2_3_c", "text": "Ban transportation", "isCorrect": false},
+          {"id": "sdg13_2_3_d", "text": "Build more factories", "isCorrect": false}
+        ], "correctAnswerId": "sdg13_2_3_b", "explanation": "The agreement seeks to limit warming to well below 2°C, ideally 1.5°C, above pre-industrial levels.", "points": 10},
+        {"id": "sdg13_2_4", "question": "Which group is most responsible for implementing SDG 13?", "answers": [
+          {"id": "sdg13_2_4_a", "text": "Movie actors", "isCorrect": false},
+          {"id": "sdg13_2_4_b", "text": "National governments", "isCorrect": true},
+          {"id": "sdg13_2_4_c", "text": "Students", "isCorrect": false},
+          {"id": "sdg13_2_4_d", "text": "Tourists", "isCorrect": false}
+        ], "correctAnswerId": "sdg13_2_4_b", "explanation": "Governments must create and enforce policies to reduce emissions and prepare for climate impacts.", "points": 10},
+        {"id": "sdg13_2_5", "question": "What is the Green Climate Fund?", "answers": [
+          {"id": "sdg13_2_5_a", "text": "Bank for fossil fuels", "isCorrect": false},
+          {"id": "sdg13_2_5_b", "text": "Funding for green fashion", "isCorrect": false},
+          {"id": "sdg13_2_5_c", "text": "International climate finance for developing countries", "isCorrect": true},
+          {"id": "sdg13_2_5_d", "text": "Forest tax fund", "isCorrect": false}
+        ], "correctAnswerId": "sdg13_2_5_c", "explanation": "It helps poorer countries build resilience and shift to low-emission development paths.", "points": 10},
+        {"id": "sdg13_2_6", "question": "What is “adaptation” in climate policy?", "answers": [
+          {"id": "sdg13_2_6_a", "text": "Preventing rainfall", "isCorrect": false},
+          {"id": "sdg13_2_6_b", "text": "Adjusting to climate effects", "isCorrect": true},
+          {"id": "sdg13_2_6_c", "text": "Ignoring climate threats", "isCorrect": false},
+          {"id": "sdg13_2_6_d", "text": "Building skyscrapers", "isCorrect": false}
+        ], "correctAnswerId": "sdg13_2_6_b", "explanation": "Adaptation means preparing for climate impacts—like sea walls, drought-resistant crops, etc.", "points": 10},
+        {"id": "sdg13_2_7", "question": "Which action supports SDG 13 personally?", "answers": [
+          {"id": "sdg13_2_7_a", "text": "Using more plastic", "isCorrect": false},
+          {"id": "sdg13_2_7_b", "text": "Saving electricity", "isCorrect": true},
+          {"id": "sdg13_2_7_c", "text": "Flying often", "isCorrect": false},
+          {"id": "sdg13_2_7_d", "text": "Wasting food", "isCorrect": false}
+        ], "correctAnswerId": "sdg13_2_7_b", "explanation": "Reducing electricity use lowers emissions and supports sustainability goals.", "points": 10},
+        {"id": "sdg13_2_8", "question": "What are NDCs in climate talks?", "answers": [
+          {"id": "sdg13_2_8_a", "text": "National Directives for Coal", "isCorrect": false},
+          {"id": "sdg13_2_8_b", "text": "New Development Cities", "isCorrect": false},
+          {"id": "sdg13_2_8_c", "text": "Nationally Determined Contributions", "isCorrect": true},
+          {"id": "sdg13_2_8_d", "text": "Nuclear Defense Councils", "isCorrect": false}
+        ], "correctAnswerId": "sdg13_2_8_c", "explanation": "NDCs are emission reduction plans that countries commit to under the Paris Agreement.", "points": 10},
+        {"id": "sdg13_2_9", "question": "Which global body oversees the SDGs?", "answers": [
+          {"id": "sdg13_2_9_a", "text": "NATO", "isCorrect": false},
+          {"id": "sdg13_2_9_b", "text": "FIFA", "isCorrect": false},
+          {"id": "sdg13_2_9_c", "text": "United Nations", "isCorrect": true},
+          {"id": "sdg13_2_9_d", "text": "OPEC", "isCorrect": false}
+        ], "correctAnswerId": "sdg13_2_9_c", "explanation": "The UN developed and monitors the 17 Sustainable Development Goals, including SDG 13.", "points": 10},
+        {"id": "sdg13_2_10", "question": "What is 'loss and damage' in climate negotiations?", "answers": [
+          {"id": "sdg13_2_10_a", "text": "Lost internet", "isCorrect": false},
+          {"id": "sdg13_2_10_b", "text": "Compensation for climate harm in vulnerable countries", "isCorrect": true},
+          {"id": "sdg13_2_10_c", "text": "Earthquake relief", "isCorrect": false},
+          {"id": "sdg13_2_10_d", "text": "Trade deficits", "isCorrect": false}
+        ], "correctAnswerId": "sdg13_2_10_b", "explanation": "'Loss and damage' refers to funding and support for countries facing irreversible climate impacts.", "points": 10}
+      ]
+    }
+  ]
+} 
